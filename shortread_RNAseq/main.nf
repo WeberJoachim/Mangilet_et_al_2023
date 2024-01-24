@@ -53,6 +53,8 @@ workflow {
             fastqc_after(hisat2_align.out.filtered_reads_1, hisat2_align.out.filtered_reads_2)
             multiqc_after(fastqc_after.out.collect())
 
+	    //preprocess genome
+	    preprocess_genome(genome.collect())
 
             //quantify
             salmon_pre_index(preprocess_genome.out.collect(), latest_transcriptome.collect())
@@ -60,7 +62,6 @@ workflow {
             salmon_quant(hisat2_align.out.filtered_reads_1, hisat2_align.out.filtered_reads_2, salmon_index.out)
 
             // align
-            preprocess_genome(genome.collect())
             hisat2_index_genome(preprocess_genome.out)
             hisat2_genome_align(hisat2_align.out.filtered_reads_1, hisat2_align.out.filtered_reads_2, hisat2_index_genome.out.collect())
             sam_to_bam(hisat2_genome_align.out.sam)
