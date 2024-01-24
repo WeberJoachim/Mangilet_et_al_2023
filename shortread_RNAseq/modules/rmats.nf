@@ -22,7 +22,8 @@ process process_transcriptome_gtf {
         sed -i s/^Chr5/5/g ${gtf}
         sed -i s/^ChrC/chloroplast/g ${gtf}
         sed -i s/^ChrM/mitochondria/g ${gtf}
-
+	
+	mv ${gtf} ${gtf.getSimpleName()}_noChr.gtf
 	
         """
 
