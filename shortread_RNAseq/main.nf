@@ -2,24 +2,65 @@
 
 nextflow.enable.dsl=2
 
-include {fastqc_before}                 from "./modules/quality_control_and_preprocessing"
-include {fastqc_after}                  from "./modules/quality_control_and_preprocessing"
-include {multiqc_before}                from "./modules/quality_control_and_preprocessing"
-include {multiqc_after}                 from "./modules/quality_control_and_preprocessing"
-include {trim_galore}                   from "./modules/quality_control_and_preprocessing"
-include {make_tRNA_rRNA_reference}      from "./modules/quality_control_and_preprocessing"
-include {hisat2_index}                  from "./modules/quality_control_and_preprocessing"
-include {hisat2_align}                  from "./modules/quality_control_and_preprocessing"
-include {salmon_pre_index}              from "./modules/salmon"
-include {salmon_index}                  from "./modules/salmon"
-include {salmon_quant}                  from "./modules/salmon"
-include {preprocess_genome}		        from "./modules/align"
-include {hisat2_index_genome}		    from "./modules/align"
-include {hisat2_genome_align}		    from "./modules/align"
-include {sam_to_bam}	                from "./modules/sam_to_bam"
-include {process_transcriptome_gtf}     from "./modules/rmats"
-include {rmats_U1_C}                    from "./modules/rmats"
-include {rmats_U1_70K}                  from "./modules/rmats"
+include {fastqc_before}                                     from "./modules/quality_control_and_preprocessing"
+include {fastqc_after}                                      from "./modules/quality_control_and_preprocessing"
+include {multiqc_before}                                    from "./modules/quality_control_and_preprocessing"
+include {multiqc_after}                                     from "./modules/quality_control_and_preprocessing"
+include {trim_galore}                                       from "./modules/quality_control_and_preprocessing"
+include {make_tRNA_rRNA_reference}                          from "./modules/quality_control_and_preprocessing"
+include {hisat2_index}                                      from "./modules/quality_control_and_preprocessing"
+include {hisat2_align}                                      from "./modules/quality_control_and_preprocessing"
+
+include {salmon_pre_index}                                  from "./modules/salmon"
+include {salmon_index}                                      from "./modules/salmon"
+include {salmon_quant}                                      from "./modules/salmon"
+
+include {preprocess_genome}		                            from "./modules/align"
+include {hisat2_index_genome}		                        from "./modules/align"
+include {hisat2_genome_align}		                        from "./modules/align"
+
+include {sam_to_bam}	                                    from "./modules/sam_to_bam"
+
+include {process_transcriptome_gtf}                         from "./modules/rmats"
+include {rmats_U1_C}                                        from "./modules/rmats"
+include {rmats_U1_70K}                                      from "./modules/rmats"
+
+include {homer_findMotifsGenome_custom_background}          from "./modules/homer"
+include {homer_findMotifsGenome_no_background}              from "./modules/homer"
+
+include {preprocess_and_extend_bed}                         from "./modules/quality_control_and_preprocessing"
+include {preprocess_and_extend_bed_custom_background}       from "./modules/quality_control_and_preprocessing"
+
+include {bedtools_getfasta}                                 from "./modules/bedtools"
+include {bedtools_getfasta as bedtools_getfasta2}           from "./modules/bedtools"
+
+include {bioconvert_fastq}                                  from "./modules/bioconvert"
+include {bioconvert_fastq as bioconvert_fastq2}             from "./modules/bioconvert"
+
+include {homer_buildMotif_AAUAAA}                           from "./modules/homer"
+include {homer_buildMotif_UUGUUU}                           from "./modules/homer"
+
+include {homer_countMotifs}                                 from "./modules/homer"
+include {homer_countMotifs as homer_countMotifs2}           from "./modules/homer"
+
+include {homer_buildMotif_cooccurence}                      from "./modules/homer"
+
+
+include {homer_co_countMotifs as homer_co_countMotifs1}     from "./modules/homer"
+include {homer_co_countMotifs as homer_co_countMotifs2}     from "./modules/homer"
+include {homer_co_countMotifs as homer_co_countMotifs3}     from "./modules/homer"
+include {homer_co_countMotifs as homer_co_countMotifs4}     from "./modules/homer"
+include {homer_co_countMotifs as homer_co_countMotifs5}     from "./modules/homer"
+include {homer_co_countMotifs as homer_co_countMotifs6}     from "./modules/homer"
+include {homer_co_countMotifs as homer_co_countMotifs7}     from "./modules/homer"
+include {homer_co_countMotifs as homer_co_countMotifs8}     from "./modules/homer"
+include {homer_co_countMotifs as homer_co_countMotifs9}     from "./modules/homer"
+include {homer_co_countMotifs as homer_co_countMotifs10}    from "./modules/homer"
+include {homer_co_countMotifs as homer_co_countMotifs11}    from "./modules/homer"
+include {homer_co_countMotifs as homer_co_countMotifs12}    from "./modules/homer"
+include {homer_co_countMotifs as homer_co_countMotifs13}    from "./modules/homer"
+include {homer_co_countMotifs as homer_co_countMotifs14}    from "./modules/homer"
+include {homer_co_countMotifs as homer_co_countMotifs15}    from "./modules/homer"
 
 
 
@@ -34,6 +75,12 @@ workflow {
             genome_gff3                 = Channel.fromPath(params.genome_gff3)
             samplesheet                 = Channel.fromPath(params.samplesheet)
             latest_transcriptome_gtf    = Channel.fromPath(params.latest_transcriptome_gtf)
+            bed_background_rnd_intron   = Channel.fromPath(params.bed_background_rnd_intron)
+            bed_background_distal_pA    = Channel.fromPath(params.bed_background_distal_pA)
+            bed_prox_rep_pA_composite   = Channel.fromPath(params.bed_prox_rep_pA_composite)
+
+            motifsize                   = Channel.of(params.motifsize)
+
 
 
             /// Workflow
@@ -53,8 +100,8 @@ workflow {
             fastqc_after(hisat2_align.out.filtered_reads_1, hisat2_align.out.filtered_reads_2)
             multiqc_after(fastqc_after.out.collect())
 
-	    //preprocess genome
-	    preprocess_genome(genome.collect())
+	        //preprocess genome
+	        preprocess_genome(genome.collect())
 
             //quantify
             salmon_pre_index(preprocess_genome.out.collect(), latest_transcriptome.collect())
@@ -68,12 +115,57 @@ workflow {
 
           	    
             // rmats
-   
             process_transcriptome_gtf(latest_transcriptome_gtf)
             rmats_U1_C(process_transcriptome_gtf.out.collect(), sam_to_bam.out.filter(~/^\[WT_.*/ ).toSortedList({a,b -> a[0] <=> b[0] }).flatten().collect(), sam_to_bam.out.filter(~/^\[U1_C.*/ ).toSortedList({a,b -> a[0] <=> b[0] }).flatten().collect())
             rmats_U1_70K(process_transcriptome_gtf.out.collect(), sam_to_bam.out.filter(~/^\[WT_.*/ ).toSortedList({a,b -> a[0] <=> b[0] }).flatten().collect(), sam_to_bam.out.filter(~/^\[U1_70K.*/ ).toSortedList({a,b -> a[0] <=> b[0] }).flatten().collect())
 
-            
-	
-	    
-}           
+
+
+
+            //motifanalysis - You can only run this, if you ran the Deseq2 analysis in the .pynb file. You also need to create the BED-files and Fastafiles as described in the .pynb file to be abl
+            if(params.bed_prox_rep_pA_composite != false){
+
+                if (params.background == false){
+
+                    preprocess_and_extend_bed(regions.collect())
+                    homer_findMotifsGenome_no_background(preprocess_and_extend_bed.out.collect(), preprocess_genome.out.collect(), motifsize)
+                    bedtools_getfasta(preprocess_and_extend_bed.out.collect(), preprocess_genome.out.collect())
+                    bioconvert_fastq(bedtools_getfasta.out)
+
+                }else{
+
+                    preprocess_and_extend_bed(regions.collect())
+                    preprocess_and_extend_bed_custom_background(background.collect())
+                    homer_findMotifsGenome_custom_background(preprocess_and_extend_bed.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), preprocess_genome.out.collect(), motifsize)
+                    bedtools_getfasta(preprocess_and_extend_bed.out.collect(), preprocess_genome.out.collect())
+                    bedtools_getfasta2(preprocess_and_extend_bed_custom_background.out.collect(), preprocess_genome.out.collect())
+                    bioconvert_fastq(bedtools_getfasta.out)
+                    bioconvert_fastq2(bedtools_getfasta2.out)
+
+                }
+
+                homer_buildMotif_AAUAAA()
+                homer_buildMotif_UUGUUU()
+
+                homer_countMotifs( preprocess_and_extend_bed.out.collect(), preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_AAUAAA.out.motif, homer_buildMotif_AAUAAA.out.mask)
+                homer_countMotifs2(preprocess_and_extend_bed.out.collect(), preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_UUGUUU.out.motif, homer_buildMotif_UUGUUU.out.mask)
+
+                homer_buildMotif_cooccurence()
+
+                homer_co_countMotifs1(preprocess_and_extend_bed.out.collect(),  preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_cooccurence.out.one)
+                homer_co_countMotifs2(preprocess_and_extend_bed.out.collect(),  preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_cooccurence.out.two)
+                homer_co_countMotifs3(preprocess_and_extend_bed.out.collect(),  preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_cooccurence.out.three)
+                homer_co_countMotifs4(preprocess_and_extend_bed.out.collect(),  preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_cooccurence.out.four)
+                homer_co_countMotifs5(preprocess_and_extend_bed.out.collect(),  preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_cooccurence.out.five)
+                homer_co_countMotifs6(preprocess_and_extend_bed.out.collect(),  preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_cooccurence.out.six)
+                homer_co_countMotifs7(preprocess_and_extend_bed.out.collect(),  preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_cooccurence.out.seven)
+                homer_co_countMotifs8(preprocess_and_extend_bed.out.collect(),  preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_cooccurence.out.eight)
+                homer_co_countMotifs9(preprocess_and_extend_bed.out.collect(),  preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_cooccurence.out.nine)
+                homer_co_countMotifs10(preprocess_and_extend_bed.out.collect(), preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_cooccurence.out.ten)
+                homer_co_countMotifs11(preprocess_and_extend_bed.out.collect(), preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_cooccurence.out.eleven)
+                homer_co_countMotifs12(preprocess_and_extend_bed.out.collect(), preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_cooccurence.out.twelve)
+                homer_co_countMotifs13(preprocess_and_extend_bed.out.collect(), preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_cooccurence.out.thirteen)
+                homer_co_countMotifs14(preprocess_and_extend_bed.out.collect(), preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_cooccurence.out.fourteen)
+                homer_co_countMotifs15(preprocess_and_extend_bed.out.collect(), preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_cooccurence.out.fifteen)
+
+            }           
