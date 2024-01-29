@@ -150,7 +150,7 @@ process hisat2_align {
 
 
 
-process preprocess_bed_custom_background {
+process preprocess_and_extend_bed_custom_background {
 
     label "preprocess_bed"
 
@@ -188,7 +188,7 @@ process preprocess_bed_custom_background {
 }
 
 
-process preprocess_bed {
+process preprocess_and_extend_bed {
 
     label "preprocess_bed"
 
