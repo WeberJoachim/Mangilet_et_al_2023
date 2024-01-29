@@ -76,7 +76,6 @@ workflow {
             samplesheet                 = Channel.fromPath(params.samplesheet)
             latest_transcriptome_gtf    = Channel.fromPath(params.latest_transcriptome_gtf)
             bed_background_rnd_intron   = Channel.fromPath(params.bed_background_rnd_intron)
-            bed_background_distal_pA    = Channel.fromPath(params.bed_background_distal_pA)
             bed_prox_rep_pA_composite   = Channel.fromPath(params.bed_prox_rep_pA_composite)
 
             motifsize                   = Channel.of(params.motifsize)
