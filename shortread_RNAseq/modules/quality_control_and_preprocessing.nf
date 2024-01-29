@@ -148,3 +148,80 @@ process hisat2_align {
 }
 
 
+
+
+process preprocess_bed_custom_background {
+
+    label "preprocess_bed"
+
+    input:
+        path(background)
+
+    output:
+        path("*chr_ext_bg.bed"), emit: background_extended
+
+    script:
+        """
+
+        awk -v OFS='\\t' '
+        {
+            if (\$6 == "-") {
+                \$2 = \$2 - 49
+                \$3 = \$3 + 50
+            } else {
+                \$2 = \$2 - 50
+                \$3 = \$3 + 49
+            }
+            print \$0
+
+        }' "${background}" > "${background.getSimpleName()}_chr_ext_bg.bed"
+
+        sed -i s/Chr1/1/g ${background.getSimpleName()}_chr_ext_bg.bed
+        sed -i s/Chr2/2/g ${background.getSimpleName()}_chr_ext_bg.bed
+        sed -i s/Chr3/3/g ${background.getSimpleName()}_chr_ext_bg.bed
+        sed -i s/Chr4/4/g ${background.getSimpleName()}_chr_ext_bg.bed
+        sed -i s/Chr5/5/g ${background.getSimpleName()}_chr_ext_bg.bed
+        sed -i s/ChrC/chloroplast/g ${background.getSimpleName()}_chr_ext_bg.bed
+        sed -i s/ChrM/mitochondria/g ${background.getSimpleName()}_chr_ext_bg.bed
+
+        """
+}
+
+
+process preprocess_bed {
+
+    label "preprocess_bed"
+
+    input:
+        path(regions)
+
+    output:
+
+        path("*_chrext.bed"), emit: extended_bed
+
+    script:
+        """
+
+        awk -v OFS='\\t' '
+        {
+            if (\$6 == "-") {
+                \$2 = \$2 - 49
+                \$3 = \$3 + 50
+            } else {
+                \$2 = \$2 - 50
+                \$3 = \$3 + 49
+            }
+            print \$0
+
+        }' ${regions} > ${regions.getSimpleName()}_chrext.bed
+
+        sed -i s/Chr1/1/g ${regions.getSimpleName()}_chrext.bed
+        sed -i s/Chr2/2/g ${regions.getSimpleName()}_chrext.bed
+        sed -i s/Chr3/3/g ${regions.getSimpleName()}_chrext.bed
+        sed -i s/Chr4/4/g ${regions.getSimpleName()}_chrext.bed
+        sed -i s/Chr5/5/g ${regions.getSimpleName()}_chrext.bed
+        sed -i s/ChrC/chloroplast/g ${regions.getSimpleName()}_chrext.bed
+        sed -i s/ChrM/mitochondria/g ${regions.getSimpleName()}_chrext.bed
+
+        """
+}
