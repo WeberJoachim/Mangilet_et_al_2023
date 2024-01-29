@@ -124,17 +124,17 @@ workflow {
             //motifanalysis - You can only run this, if you ran the Deseq2 analysis in the .pynb file. You also need to create the BED-files and Fastafiles as described in the .pynb file to be abl
             if(params.bed_prox_rep_pA_composite != false){
 
-                if (params.background == false){
+                if (params.bed_background_rnd_intron == false){
 
-                    preprocess_and_extend_bed(regions.collect())
+                    preprocess_and_extend_bed(bed_prox_rep_pA_composite.collect())
                     homer_findMotifsGenome_no_background(preprocess_and_extend_bed.out.collect(), preprocess_genome.out.collect(), motifsize)
                     bedtools_getfasta(preprocess_and_extend_bed.out.collect(), preprocess_genome.out.collect())
                     bioconvert_fastq(bedtools_getfasta.out)
 
                 }else{
 
-                    preprocess_and_extend_bed(regions.collect())
-                    preprocess_and_extend_bed_custom_background(background.collect())
+                    preprocess_and_extend_bed(bed_prox_rep_pA_composite.collect())
+                    preprocess_and_extend_bed_custom_background(bed_background_rnd_intron.collect())
                     homer_findMotifsGenome_custom_background(preprocess_and_extend_bed.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), preprocess_genome.out.collect(), motifsize)
                     bedtools_getfasta(preprocess_and_extend_bed.out.collect(), preprocess_genome.out.collect())
                     bedtools_getfasta2(preprocess_and_extend_bed_custom_background.out.collect(), preprocess_genome.out.collect())
