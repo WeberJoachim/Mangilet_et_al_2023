@@ -168,4 +168,5 @@ workflow {
                 homer_co_countMotifs14(preprocess_and_extend_bed.out.collect(), preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_cooccurence.out.fourteen)
                 homer_co_countMotifs15(preprocess_and_extend_bed.out.collect(), preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_cooccurence.out.fifteen)
 
-            }           
+            } 
+}          
