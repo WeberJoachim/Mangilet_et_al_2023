@@ -93,8 +93,8 @@ process homer_countMotifs {
 
     input:
         tuple val(name_regions), path(regions)
+        path(genome)
         tuple val(name_background), path(background)
-        path(background)
         path(motif)
         path(mask)
 
@@ -119,8 +119,8 @@ process homer_co_countMotifs {
 
     input:
         tuple val(name_regions), path(regions)
+        path(genome)
         tuple val(name_background), path(background)
-        path(background)
         tuple val(name), path(motif), path(maskA), path(maskAT), path(maskT)
 
 
