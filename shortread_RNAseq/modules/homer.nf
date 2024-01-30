@@ -114,7 +114,7 @@ process homer_countMotifs {
 process homer_co_countMotifs {
 
 
-    publishDir 'co_count_motifs/'
+    publishDir 'results/co_count_motifs/'
     label "homer_countMotifs"
 
     input:
@@ -130,7 +130,7 @@ process homer_co_countMotifs {
     script:
         """
 
-        findMotifsGenome.pl ${regions} ${genome} ./co_occurence_${name} -norevopp -size given -mknown ${motif} -maskMotif ${maskA} ${maskT} ${maskAT} -bg ${background}
+        findMotifsGenome.pl ${regions} ${genome} ./co_occurence_${name}_${regions.getSimpleName()}_${background.getSimpleName()} -norevopp -size given -mknown ${motif} -maskMotif ${maskA} ${maskT} ${maskAT} -bg ${background}
 
         """
 
