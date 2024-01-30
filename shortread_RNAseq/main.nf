@@ -147,7 +147,7 @@ workflow {
                     preprocess_and_extend_bed_custom_background(background)
 
                     //cartesian product
-                    homer_findMotifsGenome_custom_background(preprocess_and_extend_bed.out.combine(preprocess_and_extend_bed_custom_background.out), preprocess_genome.out, motifsize)
+                    homer_findMotifsGenome_custom_background(preprocess_and_extend_bed.out.combine(preprocess_and_extend_bed_custom_background.out), preprocess_genome.out.collect(), motifsize.collect())
                     bedtools_getfasta(preprocess_and_extend_bed.out, preprocess_genome.out)
                     bedtools_getfasta2(preprocess_and_extend_bed_custom_background.out, preprocess_genome.out)
                     bioconvert_fastq(bedtools_getfasta.out)
