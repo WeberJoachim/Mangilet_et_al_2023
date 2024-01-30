@@ -5,6 +5,7 @@ nextflow.enable.dsl=2
 
 process homer_findMotifsGenome_custom_background {
 
+    publishDir 'results/motif_finding'
     label "homer_findMotifsGenome"
 
     input:
@@ -27,6 +28,7 @@ process homer_findMotifsGenome_custom_background {
 
 process homer_findMotifsGenome_no_background {
 
+    publishDir 'results/motif_finding'
     label "homer_findMotifsGenome"
 
     input:
@@ -110,7 +112,6 @@ process homer_countMotifs {
 
 
 process homer_co_countMotifs {
-
 
     publishDir 'results/co_count_motifs/'
     label "homer_countMotifs"
