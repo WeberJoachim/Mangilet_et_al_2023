@@ -83,8 +83,6 @@ workflow {
         
             motifsize                           = Channel.of(params.motifsize)
 
-            bed_background_rnd_intron.view()
-
             /// Workflow
             // Initial Qualitycontrol
             fastqc_before(reads)
