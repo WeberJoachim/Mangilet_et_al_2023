@@ -8,8 +8,8 @@ process homer_findMotifsGenome_custom_background {
     label "homer_findMotifsGenome"
 
     input:
-        path(regions)
-        path(background)
+        tuple val(name_regions), path(regions)
+        tuple val(name_background), path(background)
         path(genome)
         val(motifsize)
 
@@ -19,7 +19,7 @@ process homer_findMotifsGenome_custom_background {
     script:
         """
 
-        findMotifsGenome.pl ${regions} ${genome} ./${regions.getSimpleName()}_vs_distal_bg -size given -len ${motifsize} -bg ${background}
+        findMotifsGenome.pl ${regions} ${genome} ./${name_regions}_vs_${name_background} -size given -len ${motifsize} -bg ${background}
 
         """
 }
@@ -31,7 +31,7 @@ process homer_findMotifsGenome_no_background {
     label "homer_findMotifsGenome"
 
     input:
-        path(regions)
+        tuple val(name_regions), path(regions)
         path(genome)
         val(motifsize)
 
@@ -41,7 +41,7 @@ process homer_findMotifsGenome_no_background {
     script:
         """
 
-        findMotifsGenome.pl ${regions} ${genome} ./${regions.getSimpleName()}_vs_random_bg -len ${motifsize} -size given
+        findMotifsGenome.pl ${regions} ${genome} ./${name}_vs_random_bg -len ${motifsize} -size given
 
         """
 }
@@ -92,8 +92,8 @@ process homer_countMotifs {
     label "homer_countMotifs"
 
     input:
-        path(regions)
-        path(genome)
+        tuple val(name_regions), path(regions)
+        tuple val(name_background), path(background)
         path(background)
         path(motif)
         path(mask)
@@ -104,7 +104,7 @@ process homer_countMotifs {
     script:
         """
 
-        findMotifsGenome.pl ${regions} ${genome} ./${regions.getSimpleName()}_vs_random -norevopp -mis 0 -size given -len 7 -mknown ${motif} -maskMotif ${mask} -bg ${background}
+        findMotifsGenome.pl ${regions} ${genome} ./${name_regions}_vs_${name_background} -norevopp -mis 0 -size given -len 7 -mknown ${motif} -maskMotif ${mask} -bg ${background}
 
         """
 
@@ -118,8 +118,8 @@ process homer_co_countMotifs {
     label "homer_countMotifs"
 
     input:
-        path(regions)
-        path(genome)
+        tuple val(name_regions), path(regions)
+        tuple val(name_background), path(background)
         path(background)
         tuple val(name), path(motif), path(maskA), path(maskAT), path(maskT)
 
@@ -130,7 +130,7 @@ process homer_co_countMotifs {
     script:
         """
 
-        findMotifsGenome.pl ${regions} ${genome} ./co_occurence_${name}_${regions.getSimpleName()}_${background.getSimpleName()} -norevopp -size given -mknown ${motif} -maskMotif ${maskA} ${maskT} ${maskAT} -bg ${background}
+        findMotifsGenome.pl ${regions} ${genome} ./co_occurence_${name}_${name_regions}_${name_background} -norevopp -size given -mknown ${motif} -maskMotif ${maskA} ${maskT} ${maskAT} -bg ${background}
 
         """
 

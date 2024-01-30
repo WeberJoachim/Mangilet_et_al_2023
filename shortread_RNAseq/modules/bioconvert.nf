@@ -6,15 +6,15 @@ nextflow.enable.dsl=2
 process bioconvert_fastq {
 
     input:
-        path(fasta)
+        tuple val(name), path(fasta)
 
     output:
-        "*"
+        "*.fq"
 
     script:
         """
 
-        bioconvert fasta2fastq ${fasta} ${fasta.getSimpleName()}.fq
+        bioconvert fasta2fastq ${fasta} ${name}.fq
         
         """
 }

@@ -155,10 +155,10 @@ process preprocess_and_extend_bed_custom_background {
     label "preprocess_bed"
 
     input:
-        path(background)
+        tuple val(name), path(background)
 
     output:
-        path("*chr_ext_bg.bed"), emit: background_extended
+        tuple val(name), path("*chr_ext_bg.bed"), emit: background_extended
 
     script:
         """
@@ -174,15 +174,15 @@ process preprocess_and_extend_bed_custom_background {
             }
             print \$0
 
-        }' "${background}" > "${background.getSimpleName()}_chr_ext_bg.bed"
+        }' "${background}" > "${name}_chr_ext_bg.bed"
 
-        sed -i s/Chr1/1/g ${background.getSimpleName()}_chr_ext_bg.bed
-        sed -i s/Chr2/2/g ${background.getSimpleName()}_chr_ext_bg.bed
-        sed -i s/Chr3/3/g ${background.getSimpleName()}_chr_ext_bg.bed
-        sed -i s/Chr4/4/g ${background.getSimpleName()}_chr_ext_bg.bed
-        sed -i s/Chr5/5/g ${background.getSimpleName()}_chr_ext_bg.bed
-        sed -i s/ChrC/chloroplast/g ${background.getSimpleName()}_chr_ext_bg.bed
-        sed -i s/ChrM/mitochondria/g ${background.getSimpleName()}_chr_ext_bg.bed
+        sed -i s/Chr1/1/g ${name}_chr_ext_bg.bed
+        sed -i s/Chr2/2/g ${name}_chr_ext_bg.bed
+        sed -i s/Chr3/3/g ${name}_chr_ext_bg.bed
+        sed -i s/Chr4/4/g ${name}_chr_ext_bg.bed
+        sed -i s/Chr5/5/g ${name}_chr_ext_bg.bed
+        sed -i s/ChrC/chloroplast/g ${name}_chr_ext_bg.bed
+        sed -i s/ChrM/mitochondria/g ${name}_chr_ext_bg.bed
 
         """
 }
@@ -193,11 +193,11 @@ process preprocess_and_extend_bed {
     label "preprocess_bed"
 
     input:
-        path(regions)
+        tuple val(name), path(regions)
 
     output:
 
-        path("*_chrext.bed"), emit: extended_bed
+        tuple val(name), path("*_chrext.bed"), emit: extended_bed
 
     script:
         """
@@ -213,15 +213,15 @@ process preprocess_and_extend_bed {
             }
             print \$0
 
-        }' ${regions} > ${regions.getSimpleName()}_chrext.bed
+        }' ${regions} > ${name}_chrext.bed
 
-        sed -i s/Chr1/1/g ${regions.getSimpleName()}_chrext.bed
-        sed -i s/Chr2/2/g ${regions.getSimpleName()}_chrext.bed
-        sed -i s/Chr3/3/g ${regions.getSimpleName()}_chrext.bed
-        sed -i s/Chr4/4/g ${regions.getSimpleName()}_chrext.bed
-        sed -i s/Chr5/5/g ${regions.getSimpleName()}_chrext.bed
-        sed -i s/ChrC/chloroplast/g ${regions.getSimpleName()}_chrext.bed
-        sed -i s/ChrM/mitochondria/g ${regions.getSimpleName()}_chrext.bed
+        sed -i s/Chr1/1/g ${name}_chrext.bed
+        sed -i s/Chr2/2/g ${name}_chrext.bed
+        sed -i s/Chr3/3/g ${name}_chrext.bed
+        sed -i s/Chr4/4/g ${name}_chrext.bed
+        sed -i s/Chr5/5/g ${name}_chrext.bed
+        sed -i s/ChrC/chloroplast/g ${name}_chrext.bed
+        sed -i s/ChrM/mitochondria/g ${name}_chrext.bed
 
         """
 }

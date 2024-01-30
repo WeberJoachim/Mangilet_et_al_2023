@@ -5,16 +5,16 @@ nextflow.enable.dsl=2
 process bedtools_getfasta {
 
     input:
-        path(regions)
+        tuple val(name), path(regions)
         path(genome)
 
     output:
-        path("*fa")
+        tuple val(name), path("*fa")
 
     script:
         """
 
-        bedtools getfasta -fi ${genome} -bed ${regions} -s -fo ${regions.getSimpleName()}.fa
+        bedtools getfasta -fi ${genome} -bed ${regions} -s -fo ${name}.fa
 
         """
 }

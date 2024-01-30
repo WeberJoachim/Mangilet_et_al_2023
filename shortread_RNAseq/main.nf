@@ -68,19 +68,22 @@ include {homer_co_countMotifs as homer_co_countMotifs15}    from "./modules/home
 workflow {
         main:     
             // Input
-            reads                       = Channel.fromFilePairs(params.reads)
-	        latest_transcriptome        = Channel.fromPath(params.latest_transcriptome)
-            gene_types_araport11        = Channel.fromPath(params.gene_types_araport11)
-	        genome                      = Channel.fromPath(params.genome)
-            genome_gff3                 = Channel.fromPath(params.genome_gff3)
-            samplesheet                 = Channel.fromPath(params.samplesheet)
-            latest_transcriptome_gtf    = Channel.fromPath(params.latest_transcriptome_gtf)
-            bed_background_rnd_intron   = Channel.fromPath(params.bed_background_rnd_intron)
-            bed_prox_rep_pA_composite   = Channel.fromPath(params.bed_prox_rep_pA_composite)
+            reads                               = Channel.fromFilePairs(params.reads)
+	        latest_transcriptome                = Channel.fromPath(params.latest_transcriptome)
+            gene_types_araport11                = Channel.fromPath(params.gene_types_araport11)
+	        genome                              = Channel.fromPath(params.genome)
+            genome_gff3                         = Channel.fromPath(params.genome_gff3)
+            samplesheet                         = Channel.fromPath(params.samplesheet)
+            latest_transcriptome_gtf            = Channel.fromPath(params.latest_transcriptome_gtf)
 
-            motifsize                   = Channel.of(params.motifsize)
+            bed_background_rnd_intron           = Channel.fromPath(params.bed_background_rnd_intron).map{tuple(it.getSimpleName(), it)}
+            bed_background_distal_pAs           = Channel.fromPath(params.bed_background_distal_pAs).map{tuple(it.getSimpleName(), it)}
+            bed_prox_rep_pA_composite_u170k     = Channel.fromPath(params.bed_prox_rep_pA_composite_u170k).map{tuple(it.getSimpleName(), it)}
+            bed_prox_rep_pA_composite_u1c       = Channel.fromPath(params.bed_prox_rep_pA_composite_u1c).map{tuple(it.getSimpleName(), it)}
+        
+            motifsize                           = Channel.of(params.motifsize)
 
-
+            bed_background_rnd_intron.view()
 
             /// Workflow
             // Initial Qualitycontrol
@@ -121,23 +124,27 @@ workflow {
 
 
 
-            //motifanalysis - You can only run this, if you ran the Deseq2 analysis in the .pynb file. You also need to create the BED-files and Fastafiles as described in the .pynb file to be abl
-            if(params.bed_prox_rep_pA_composite != false){
+            //motifanalysis - You can only run this, if you ran the Deseq2 analysis in the .pynb file. You also need to create the BED-files and Fastafiles as described in the .pynb file to be able to run this
+            
+            background = bed_background_rnd_intron.concat(bed_background_distal_pAs).ifEmpty(false)
+            regions = bed_prox_rep_pA_composite_u170k.concat(bed_prox_rep_pA_composite_u1c).ifEmpty(false)
 
-                if (params.bed_background_rnd_intron == false){
+            if(regions != false){
 
-                    preprocess_and_extend_bed(bed_prox_rep_pA_composite.collect())
+                if (background == false){
+
+                    preprocess_and_extend_bed(regions)
                     homer_findMotifsGenome_no_background(preprocess_and_extend_bed.out.collect(), preprocess_genome.out.collect(), motifsize)
-                    bedtools_getfasta(preprocess_and_extend_bed.out.collect(), preprocess_genome.out.collect())
+                    bedtools_getfasta(preprocess_and_extend_bed.out, preprocess_genome.out)
                     bioconvert_fastq(bedtools_getfasta.out)
 
                 }else{
 
-                    preprocess_and_extend_bed(bed_prox_rep_pA_composite.collect())
-                    preprocess_and_extend_bed_custom_background(bed_background_rnd_intron.collect())
-                    homer_findMotifsGenome_custom_background(preprocess_and_extend_bed.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), preprocess_genome.out.collect(), motifsize)
-                    bedtools_getfasta(preprocess_and_extend_bed.out.collect(), preprocess_genome.out.collect())
-                    bedtools_getfasta2(preprocess_and_extend_bed_custom_background.out.collect(), preprocess_genome.out.collect())
+                    preprocess_and_extend_bed(regions)
+                    preprocess_and_extend_bed_custom_background(background)
+                    homer_findMotifsGenome_custom_background(preprocess_and_extend_bed.out, preprocess_and_extend_bed_custom_background.out, preprocess_genome.out, motifsize)
+                    bedtools_getfasta(preprocess_and_extend_bed.out, preprocess_genome.out)
+                    bedtools_getfasta2(preprocess_and_extend_bed_custom_background.out, preprocess_genome.out)
                     bioconvert_fastq(bedtools_getfasta.out)
                     bioconvert_fastq2(bedtools_getfasta2.out)
 
@@ -146,26 +153,26 @@ workflow {
                 homer_buildMotif_AAUAAA()
                 homer_buildMotif_UUGUUU()
 
-                homer_countMotifs( preprocess_and_extend_bed.out.collect(), preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_AAUAAA.out.motif, homer_buildMotif_AAUAAA.out.mask)
-                homer_countMotifs2(preprocess_and_extend_bed.out.collect(), preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_UUGUUU.out.motif, homer_buildMotif_UUGUUU.out.mask)
+                homer_countMotifs( preprocess_and_extend_bed.out, preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out, homer_buildMotif_AAUAAA.out.motif, homer_buildMotif_AAUAAA.out.mask)
+                homer_countMotifs2(preprocess_and_extend_bed.out, preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out, homer_buildMotif_UUGUUU.out.motif, homer_buildMotif_UUGUUU.out.mask)
 
                 homer_buildMotif_cooccurence()
 
-                homer_co_countMotifs1(preprocess_and_extend_bed.out.collect(),  preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_cooccurence.out.one)
-                homer_co_countMotifs2(preprocess_and_extend_bed.out.collect(),  preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_cooccurence.out.two)
-                homer_co_countMotifs3(preprocess_and_extend_bed.out.collect(),  preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_cooccurence.out.three)
-                homer_co_countMotifs4(preprocess_and_extend_bed.out.collect(),  preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_cooccurence.out.four)
-                homer_co_countMotifs5(preprocess_and_extend_bed.out.collect(),  preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_cooccurence.out.five)
-                homer_co_countMotifs6(preprocess_and_extend_bed.out.collect(),  preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_cooccurence.out.six)
-                homer_co_countMotifs7(preprocess_and_extend_bed.out.collect(),  preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_cooccurence.out.seven)
-                homer_co_countMotifs8(preprocess_and_extend_bed.out.collect(),  preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_cooccurence.out.eight)
-                homer_co_countMotifs9(preprocess_and_extend_bed.out.collect(),  preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_cooccurence.out.nine)
-                homer_co_countMotifs10(preprocess_and_extend_bed.out.collect(), preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_cooccurence.out.ten)
-                homer_co_countMotifs11(preprocess_and_extend_bed.out.collect(), preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_cooccurence.out.eleven)
-                homer_co_countMotifs12(preprocess_and_extend_bed.out.collect(), preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_cooccurence.out.twelve)
-                homer_co_countMotifs13(preprocess_and_extend_bed.out.collect(), preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_cooccurence.out.thirteen)
-                homer_co_countMotifs14(preprocess_and_extend_bed.out.collect(), preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_cooccurence.out.fourteen)
-                homer_co_countMotifs15(preprocess_and_extend_bed.out.collect(), preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out.collect(), homer_buildMotif_cooccurence.out.fifteen)
+                homer_co_countMotifs1(preprocess_and_extend_bed.out,  preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out, homer_buildMotif_cooccurence.out.one)
+                homer_co_countMotifs2(preprocess_and_extend_bed.out,  preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out, homer_buildMotif_cooccurence.out.two)
+                homer_co_countMotifs3(preprocess_and_extend_bed.out,  preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out, homer_buildMotif_cooccurence.out.three)
+                homer_co_countMotifs4(preprocess_and_extend_bed.out,  preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out, homer_buildMotif_cooccurence.out.four)
+                homer_co_countMotifs5(preprocess_and_extend_bed.out,  preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out, homer_buildMotif_cooccurence.out.five)
+                homer_co_countMotifs6(preprocess_and_extend_bed.out,  preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out, homer_buildMotif_cooccurence.out.six)
+                homer_co_countMotifs7(preprocess_and_extend_bed.out,  preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out, homer_buildMotif_cooccurence.out.seven)
+                homer_co_countMotifs8(preprocess_and_extend_bed.out,  preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out, homer_buildMotif_cooccurence.out.eight)
+                homer_co_countMotifs9(preprocess_and_extend_bed.out,  preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out, homer_buildMotif_cooccurence.out.nine)
+                homer_co_countMotifs10(preprocess_and_extend_bed.out, preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out, homer_buildMotif_cooccurence.out.ten)
+                homer_co_countMotifs11(preprocess_and_extend_bed.out, preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out, homer_buildMotif_cooccurence.out.eleven)
+                homer_co_countMotifs12(preprocess_and_extend_bed.out, preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out, homer_buildMotif_cooccurence.out.twelve)
+                homer_co_countMotifs13(preprocess_and_extend_bed.out, preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out, homer_buildMotif_cooccurence.out.thirteen)
+                homer_co_countMotifs14(preprocess_and_extend_bed.out, preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out, homer_buildMotif_cooccurence.out.fourteen)
+                homer_co_countMotifs15(preprocess_and_extend_bed.out, preprocess_genome.out.collect(), preprocess_and_extend_bed_custom_background.out, homer_buildMotif_cooccurence.out.fifteen)
 
             } 
 }          
