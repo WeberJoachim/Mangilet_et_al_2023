@@ -8,8 +8,7 @@ process homer_findMotifsGenome_custom_background {
     label "homer_findMotifsGenome"
 
     input:
-        tuple val(name_regions), path(regions)
-        tuple val(name_background), path(background)
+        tuple val(name_regions), path(regions), val(name_background), path(background)
         path(genome)
         val(motifsize)
 
@@ -92,9 +91,8 @@ process homer_countMotifs {
     label "homer_countMotifs"
 
     input:
-        tuple val(name_regions), path(regions)
+        tuple val(name_regions), path(regions), val(name_background), path(background)
         path(genome)
-        tuple val(name_background), path(background)
         path(motif)
         path(mask)
 
@@ -118,9 +116,8 @@ process homer_co_countMotifs {
     label "homer_countMotifs"
 
     input:
-        tuple val(name_regions), path(regions)
+        tuple val(name_regions), path(regions), val(name_background), path(background)
         path(genome)
-        tuple val(name_background), path(background)
         tuple val(name), path(motif), path(maskA), path(maskAT), path(maskT)
 
 
