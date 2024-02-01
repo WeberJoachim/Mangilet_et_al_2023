@@ -17,6 +17,7 @@ include {sam_to_bam}                    from "./modules/sam_to_bam"
 include {sort_and_index}                from "./modules/sam_to_bam"
 include {deeptools_multibamsummary}     from "./modules/deeptools"
 include {deeptools_plots}               from "./modules/deeptools"
+include {python_add_introns}            from "./modules/python"
 
 
 
@@ -60,7 +61,8 @@ workflow {
             deeptools_multibamsummary(sort_and_index.out.sorted_bam.collect(), sort_and_index.out.sorted_bam_index.collect())
             deeptools_plots(deeptools_multibamsummary.out.numpy_array)
 	    
-            
+            //add introns to atrtd3 gtf. I need this for motifanalysis later, remember to make the script executable
+            python_add_introns(process_transcriptome_gtf.out)
 
 	
 }           

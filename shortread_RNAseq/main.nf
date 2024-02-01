@@ -25,7 +25,6 @@ include {process_transcriptome_gtf}                         from "./modules/rmat
 include {rmats_U1_C}                                        from "./modules/rmats"
 include {rmats_U1_70K}                                      from "./modules/rmats"
 
-include {python_add_introns}                                from "./modules/python"
 
 include {homer_findMotifsGenome_custom_background}          from "./modules/homer"
 include {homer_findMotifsGenome_no_background}              from "./modules/homer"
@@ -121,11 +120,7 @@ workflow {
             rmats_U1_C(process_transcriptome_gtf.out.collect(), sam_to_bam.out.filter(~/^\[WT_.*/ ).toSortedList({a,b -> a[0] <=> b[0] }).flatten().collect(), sam_to_bam.out.filter(~/^\[U1_C.*/ ).toSortedList({a,b -> a[0] <=> b[0] }).flatten().collect())
             rmats_U1_70K(process_transcriptome_gtf.out.collect(), sam_to_bam.out.filter(~/^\[WT_.*/ ).toSortedList({a,b -> a[0] <=> b[0] }).flatten().collect(), sam_to_bam.out.filter(~/^\[U1_70K.*/ ).toSortedList({a,b -> a[0] <=> b[0] }).flatten().collect())
 
-            //add introns to atrtd3 gtf. I need this for motifanalysis later, remember to make the script executable
             
-            python_add_introns(process_transcriptome_gtf.out)
-
-
             //motifanalysis - You can only run this, if you ran the Deseq2 analysis in the .pynb file. You also need to create the BED-files and Fastafiles as described in the .pynb file to be able to run this
             
             background = bed_background_rnd_intron.concat(bed_background_distal_pAs).ifEmpty(false)
