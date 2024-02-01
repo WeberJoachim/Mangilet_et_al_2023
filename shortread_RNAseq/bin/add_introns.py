@@ -1,3 +1,5 @@
+#!/usr/local/bin/python
+
 def add_introns_to_gtf(input_gtf_path, output_gtf_path):
     gene_transcripts = {}
     with open(input_gtf_path, 'r') as input_gtf:
@@ -64,6 +66,7 @@ def add_introns_to_gtf(input_gtf_path, output_gtf_path):
     print("Introns have been added to the GTF file.")
 
 if __name__ == '__main__':
+    import argparse
     parser = argparse.ArgumentParser(description='Add introns to a GTF file with exons and other features.')
     parser.add_argument('input_gtf_file', help='Path to the input GTF file containing exons and other features.')
     parser.add_argument('output_gtf_file', help='Path to the output GTF file with added introns.')

@@ -17,7 +17,8 @@ process python_add_introns {
     script:
         """
 
-        python3 add_introns.py ${gtf} ${gtf.getSimpleName()}_introns.gtf
+        add_introns.py ${gtf} ${gtf.getSimpleName()}_introns.gtf
+        
 
         """
 }

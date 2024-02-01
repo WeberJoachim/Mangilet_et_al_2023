@@ -121,7 +121,7 @@ workflow {
             rmats_U1_C(process_transcriptome_gtf.out.collect(), sam_to_bam.out.filter(~/^\[WT_.*/ ).toSortedList({a,b -> a[0] <=> b[0] }).flatten().collect(), sam_to_bam.out.filter(~/^\[U1_C.*/ ).toSortedList({a,b -> a[0] <=> b[0] }).flatten().collect())
             rmats_U1_70K(process_transcriptome_gtf.out.collect(), sam_to_bam.out.filter(~/^\[WT_.*/ ).toSortedList({a,b -> a[0] <=> b[0] }).flatten().collect(), sam_to_bam.out.filter(~/^\[U1_70K.*/ ).toSortedList({a,b -> a[0] <=> b[0] }).flatten().collect())
 
-            //add introns to atrtd3 gtf. I need this for motifanalysis later
+            //add introns to atrtd3 gtf. I need this for motifanalysis later, remember to make the script executable
             
             python_add_introns(process_transcriptome_gtf.out)
 
