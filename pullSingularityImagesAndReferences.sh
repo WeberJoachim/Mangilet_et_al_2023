@@ -19,7 +19,7 @@ singularity pull salmon-1.9.0-h7e5ed60_1.sif https://depot.galaxyproject.org/sin
 singularity pull homer-4.11--pl5321h9f5acd7_7.sif https://depot.galaxyproject.org/singularity/homer%3A4.11--pl5321h9f5acd7_7
 singularity pull bedtools_2.31.1--hf5e1c6e_0.sif https://depot.galaxyproject.org/singularity/bedtools%3A2.31.1--hf5e1c6e_0
 singularity pull bioconvert-1.1.1--pyhdfd78af_0.sif https://depot.galaxyproject.org/singularity/bioconvert%3A1.1.1--pyhdfd78af_0
-
+singularity pull python3_3.10.4.sif https://depot.galaxyproject.org/singularity/python%3A3.10.4
 
 
 #references
