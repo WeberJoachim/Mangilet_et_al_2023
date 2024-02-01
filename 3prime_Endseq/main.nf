@@ -2,22 +2,24 @@
 
 nextflow.enable.dsl=2
 
-include {fastqc_before}                 from "./modules/quality_control_and_preprocessing"
-include {fastqc_after}                  from "./modules/quality_control_and_preprocessing"
-include {multiqc_before}                from "./modules/quality_control_and_preprocessing"
-include {multiqc_after}                 from "./modules/quality_control_and_preprocessing"
-include {trim_galore}                   from "./modules/quality_control_and_preprocessing"
-include {make_tRNA_rRNA_reference}      from "./modules/quality_control_and_preprocessing"
-include {hisat2_index}                  from "./modules/quality_control_and_preprocessing"
-include {hisat2_align}                  from "./modules/quality_control_and_preprocessing"
-include {preprocess_genome}             from "./modules/align"
-include {hisat2_index_genome}           from "./modules/align"
-include {hisat2_genome_align}           from "./modules/align"
-include {sam_to_bam}                    from "./modules/sam_to_bam"
-include {sort_and_index}                from "./modules/sam_to_bam"
-include {deeptools_multibamsummary}     from "./modules/deeptools"
-include {deeptools_plots}               from "./modules/deeptools"
-include {python_add_introns}            from "./modules/python"
+include {fastqc_before}                                 from "./modules/quality_control_and_preprocessing"
+include {fastqc_after}                                  from "./modules/quality_control_and_preprocessing"
+include {multiqc_before}                                from "./modules/quality_control_and_preprocessing"
+include {multiqc_after}                                 from "./modules/quality_control_and_preprocessing"
+include {trim_galore}                                   from "./modules/quality_control_and_preprocessing"
+include {make_tRNA_rRNA_reference}                      from "./modules/quality_control_and_preprocessing"
+include {hisat2_index}                                  from "./modules/quality_control_and_preprocessing"
+include {hisat2_align}                                  from "./modules/quality_control_and_preprocessing"
+include {preprocess_genome}                             from "./modules/align"
+include {hisat2_index_genome}                           from "./modules/align"
+include {hisat2_genome_align}                           from "./modules/align"
+include {sam_to_bam}                                    from "./modules/sam_to_bam"
+include {sort_and_index}                                from "./modules/sam_to_bam"
+include {deeptools_multibamsummary}                     from "./modules/deeptools"
+include {deeptools_plots}                               from "./modules/deeptools"
+include {python_add_introns}                            from "./modules/python"
+include {bedtools_closest as bedtools_closest_u1c}      from "./modules/bedtools"
+include {bedtools_closest as bedtools_closest_u170k}    from "./modules/bedtools"
 
 
 
@@ -28,6 +30,10 @@ workflow {
 	        latest_transcriptome        = Channel.fromPath(params.latest_transcriptome)
             gene_types_araport11        = Channel.fromPath(params.gene_types_araport11)
 	        genome                      = Channel.fromPath(params.genome)
+
+            proximal_pA_u1c             = Channel.fromPath(params.pA_u1c)
+            proximal_pA_u170k           = Channel.fromPath(params.pA_u170k)
+            
                    
 
 
@@ -62,7 +68,12 @@ workflow {
             deeptools_plots(deeptools_multibamsummary.out.numpy_array)
 	    
             //add introns to atrtd3 gtf. I need this for motifanalysis later, remember to make the script executable
-            python_add_introns(process_transcriptome_gtf.out)
+            python_add_introns(latest_transcriptome.collect())
 
+
+            //extract distances from proximal pAs to intron boundaries
+
+            bedtools_closest_u1c(python_add_introns.out.collect(),      proximal_pA_u1c)
+            bedtools_closest_u170k(python_add_introns.out.collect(),    proximal_pA_u170k)
 	
 }           
