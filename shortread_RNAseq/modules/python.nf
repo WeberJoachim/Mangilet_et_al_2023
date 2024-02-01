@@ -5,14 +5,14 @@ nextflow.enable.dsl=2
 
 process python_add_introns {
 
-    publishDir 'results/'
+    publishDir 'results/', mode: 'copy', overwrite: false
     label 'python'
 
     input:
         path(gtf)
     
     output:
-        "*"
+        path("*_introns.gtf"), emit: intron_gtf
 
     script:
         """
