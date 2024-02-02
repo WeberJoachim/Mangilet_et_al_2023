@@ -30,7 +30,7 @@ workflow {
 	        latest_transcriptome        = Channel.fromPath(params.latest_transcriptome)
             gene_types_araport11        = Channel.fromPath(params.gene_types_araport11)
 	        genome                      = Channel.fromPath(params.genome)
-
+	    latest_transcriptome_gtf 	= Channel.fromPath(params.latest_transcriptome_gtf)
             proximal_pA_u1c             = Channel.fromPath(params.pA_u1c)
             proximal_pA_u170k           = Channel.fromPath(params.pA_u170k)
             
@@ -68,7 +68,7 @@ workflow {
             deeptools_plots(deeptools_multibamsummary.out.numpy_array)
 	    
             //add introns to atrtd3 gtf. I need this for motifanalysis later, remember to make the script executable
-            python_add_introns(latest_transcriptome.collect())
+            python_add_introns(latest_transcriptome_gtf.collect())
 
 
             //extract distances from proximal pAs to intron boundaries
