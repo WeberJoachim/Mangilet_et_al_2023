@@ -20,6 +20,7 @@ include {deeptools_plots}                               from "./modules/deeptool
 include {python_add_introns}                            from "./modules/python"
 include {bedtools_closest as bedtools_closest_u1c}      from "./modules/bedtools"
 include {bedtools_closest as bedtools_closest_u170k}    from "./modules/bedtools"
+include {preprocess_gtf}                                from "./modules/quality_control_and_preprocessing"
 
 
 
@@ -72,8 +73,8 @@ workflow {
 
 
             //extract distances from proximal pAs to intron boundaries
-
-            bedtools_closest_u1c(python_add_introns.out.collect(),      proximal_pA_u1c)
-            bedtools_closest_u170k(python_add_introns.out.collect(),    proximal_pA_u170k)
+            preprocess_gtf(python_add_introns.out)
+            bedtools_closest_u1c(preprocess_gtf.out.collect(),      proximal_pA_u1c)
+            bedtools_closest_u170k(preprocess_gtf.out.collect(),    proximal_pA_u170k)
 	
 }           

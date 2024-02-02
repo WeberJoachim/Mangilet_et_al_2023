@@ -143,3 +143,24 @@ process hisat2_align {
         hisat2 -p 16 --min-intronlen 20 --max-intronlen 1000 -x ${index[0].getSimpleName()} -U ${trimmed_reads} --un-gz ${trimmed_reads.getSimpleName()}_un.fq.gz 2> ${trimmed_reads.getSimpleName()}.log
         """
 }
+
+process preprocess_gtf {
+    
+    input:
+        path(gtf) 
+       
+    output:
+        path "*_noChr.gtf" 
+
+    script:
+        """     
+        cp ${gtf} ${gtf.getSimpleName()}_noChr.gtf
+        sed -i s/Chr1/1/g ${gtf}_noChr.gtf
+        sed -i s/Chr2/2/g ${gtf}_noChr.gtf
+        sed -i s/Chr3/3/g ${gtf}_noChr.gtf
+        sed -i s/Chr4/4/g ${gtf}_noChr.gtf
+        sed -i s/Chr5/5/g ${gtf}_noChr.gtf
+        sed -i s/ChrC/chloroplast/g ${gtf}_noChr.gtf
+        sed -i s/ChrM/mitochondria/g ${gtf}_noChr.gtf
+        """
+}
