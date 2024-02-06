@@ -126,8 +126,8 @@ workflow {
             
             //motifanalysis - You can only run this, if you ran the Deseq2 analysis in the .pynb file. You also need to create the BED-files and Fastafiles as described in the .pynb file to be able to run this
             
-            background = bed_background_rnd_intron.concat(bed_background_distal_pAs).ifEmpty(false)
-            regions = bed_prox_rep_pA_composite_u170k.concat(bed_prox_rep_pA_composite_u1c, bed_all_introns, bed_distal_pA_where_comp_rep_u1c, bed_distal_pA_where_comp_rep_u170k).ifEmpty(false)
+            background = bed_background_rnd_intron.concat(bed_background_distal_pAs, bed_all_introns, bed_distal_pA_where_comp_rep_u1c, bed_distal_pA_where_comp_rep_u170k).ifEmpty(false)
+            regions = bed_prox_rep_pA_composite_u170k.concat(bed_prox_rep_pA_composite_u1c).ifEmpty(false)
 
             if(regions != false){
                 
