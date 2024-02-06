@@ -14,7 +14,7 @@ process homer_findMotifsGenome_custom_background {
         val(motifsize)
 
     output:
-        path('${name_regions}_vs_${name_background}/', type: 'dir')
+        path('*', type: 'dir', emit: results_folder)
 
     script:
         """
