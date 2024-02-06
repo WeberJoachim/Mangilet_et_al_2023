@@ -82,9 +82,9 @@ workflow {
             bed_prox_rep_pA_composite_u170k     = Channel.fromPath(params.bed_prox_rep_pA_composite_u170k).map{tuple(it.getSimpleName(), it)}
             bed_prox_rep_pA_composite_u1c       = Channel.fromPath(params.bed_prox_rep_pA_composite_u1c).map{tuple(it.getSimpleName(), it)}
 
-            bed_all_introns			    	    = Channel.fromPath(param.bed_all_introns).map{tuple(it.getSimpleName(), it)}
-            bed_distal_pA_where_comp_rep_u1c	= Channel.fromPath(param.bed_distal_pA_where_comp_rep_u1c).map{tuple(it.getSimpleName(), it)}
-            bed_distal_pA_where_comp_rep_u170k	= Channel.fromPath(param.bed_distal_pA_where_comp_rep_u170k).map{tuple(it.getSimpleName(), it)}
+            bed_all_introns			    	    = Channel.fromPath(params.bed_all_introns).map{tuple(it.getSimpleName(), it)}
+            bed_distal_pA_where_comp_rep_u1c	= Channel.fromPath(params.bed_distal_pA_where_comp_rep_u1c).map{tuple(it.getSimpleName(), it)}
+            bed_distal_pA_where_comp_rep_u170k	= Channel.fromPath(params.bed_distal_pA_where_comp_rep_u170k).map{tuple(it.getSimpleName(), it)}
             motifsize                           = Channel.of(params.motifsize)
 
             /// Workflow
