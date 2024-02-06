@@ -81,7 +81,10 @@ workflow {
             bed_background_distal_pAs           = Channel.fromPath(params.bed_background_distal_pAs).map{tuple(it.getSimpleName(), it)}
             bed_prox_rep_pA_composite_u170k     = Channel.fromPath(params.bed_prox_rep_pA_composite_u170k).map{tuple(it.getSimpleName(), it)}
             bed_prox_rep_pA_composite_u1c       = Channel.fromPath(params.bed_prox_rep_pA_composite_u1c).map{tuple(it.getSimpleName(), it)}
-        
+
+            bed_all_introns			    	    = Channel.fromPath(param.bed_all_introns).map{tuple(it.getSimpleName(), it)}
+            bed_distal_pA_where_comp_rep_u1c	= Channel.fromPath(param.bed_distal_pA_where_comp_rep_u1c).map{tuple(it.getSimpleName(), it)}
+            bed_distal_pA_where_comp_rep_u170k	= Channel.fromPath(param.bed_distal_pA_where_comp_rep_u170k).map{tuple(it.getSimpleName(), it)}
             motifsize                           = Channel.of(params.motifsize)
 
             /// Workflow
@@ -124,7 +127,7 @@ workflow {
             //motifanalysis - You can only run this, if you ran the Deseq2 analysis in the .pynb file. You also need to create the BED-files and Fastafiles as described in the .pynb file to be able to run this
             
             background = bed_background_rnd_intron.concat(bed_background_distal_pAs).ifEmpty(false)
-            regions = bed_prox_rep_pA_composite_u170k.concat(bed_prox_rep_pA_composite_u1c).ifEmpty(false)
+            regions = bed_prox_rep_pA_composite_u170k.concat(bed_prox_rep_pA_composite_u1c, bed_all_introns, bed_distal_pA_where_comp_rep_u1c, bed_distal_pA_where_comp_rep_u170k).ifEmpty(false)
 
             if(regions != false){
                 
@@ -147,8 +150,8 @@ workflow {
 
                     //cartesian product
                     homer_findMotifsGenome_custom_background(preprocess_and_extend_bed.out.combine(preprocess_and_extend_bed_custom_background.out), preprocess_genome.out.collect(), motifsize.collect())
-                    bedtools_getfasta(preprocess_and_extend_bed.out, preprocess_genome.out)
-                    bedtools_getfasta2(preprocess_and_extend_bed_custom_background.out, preprocess_genome.out)
+                    bedtools_getfasta(preprocess_and_extend_bed.out, preprocess_genome.out.collect())
+                    bedtools_getfasta2(preprocess_and_extend_bed_custom_background.out, preprocess_genome.out.collect())
                     bioconvert_fastq(bedtools_getfasta.out)
                     bioconvert_fastq2(bedtools_getfasta2.out)
 
