@@ -140,43 +140,42 @@ process homer_buildMotif_cooccurence{
 
     label "homer_buildMotif"
 
+
+    input:
+        tuple val(a_rich_motif), val(u_rich_motif)
+
+
     output:
-        tuple val("1N"),  path("*_1N.motif"),  path("*_1N_mask_A.motif"),  path("*_1N_mask_AT.motif"),  path("*_1N_mask_T.motif"),  emit: one
-        tuple val("2N"),  path("*_2N.motif"),  path("*_2N_mask_A.motif"),  path("*_2N_mask_AT.motif"),  path("*_2N_mask_T.motif"),  emit: two
-        tuple val("3N"),  path("*_3N.motif"),  path("*_3N_mask_A.motif"),  path("*_3N_mask_AT.motif"),  path("*_3N_mask_T.motif"),  emit: three
-        tuple val("4N"),  path("*_4N.motif"),  path("*_4N_mask_A.motif"),  path("*_4N_mask_AT.motif"),  path("*_4N_mask_T.motif"),  emit: four
-        tuple val("5N"),  path("*_5N.motif"),  path("*_5N_mask_A.motif"),  path("*_5N_mask_AT.motif"),  path("*_5N_mask_T.motif"),  emit: five
-        tuple val("6N"),  path("*_6N.motif"),  path("*_6N_mask_A.motif"),  path("*_6N_mask_AT.motif"),  path("*_6N_mask_T.motif"),  emit: six
-        tuple val("7N"),  path("*_7N.motif"),  path("*_7N_mask_A.motif"),  path("*_7N_mask_AT.motif"),  path("*_7N_mask_T.motif"),  emit: seven
-        tuple val("8N"),  path("*_8N.motif"),  path("*_8N_mask_A.motif"),  path("*_8N_mask_AT.motif"),  path("*_8N_mask_T.motif"),  emit: eight
-        tuple val("9N"),  path("*_9N.motif"),  path("*_9N_mask_A.motif"),  path("*_9N_mask_AT.motif"),  path("*_9N_mask_T.motif"),  emit: nine
-        tuple val("10N"), path("*_10N.motif"), path("*_10N_mask_A.motif"), path("*_10N_mask_AT.motif"), path("*_10N_mask_T.motif"), emit: ten
-        tuple val("11N"), path("*_11N.motif"), path("*_11N_mask_A.motif"), path("*_11N_mask_AT.motif"), path("*_11N_mask_T.motif"), emit: eleven
-        tuple val("12N"), path("*_12N.motif"), path("*_12N_mask_A.motif"), path("*_12N_mask_AT.motif"), path("*_12N_mask_T.motif"), emit: twelve
-        tuple val("13N"), path("*_13N.motif"), path("*_13N_mask_A.motif"), path("*_13N_mask_AT.motif"), path("*_13N_mask_T.motif"), emit: thirteen
-        tuple val("14N"), path("*_14N.motif"), path("*_14N_mask_A.motif"), path("*_14N_mask_AT.motif"), path("*_14N_mask_T.motif"), emit: fourteen
-        tuple val("15N"), path("*_15N.motif"), path("*_15N_mask_A.motif"), path("*_15N_mask_AT.motif"), path("*_15N_mask_T.motif"), emit: fifteen
+
+        tuple val("0N"),  path("*_0N_*"),  emit: zero
+        tuple val("1N"),  path("*_1N_*"),  emit: one
+        tuple val("2N"),  path("*_2N_*"),  emit: two
+        tuple val("3N"),  path("*_3N_*"),  emit: three
+        tuple val("4N"),  path("*_4N_*"),  emit: four
+        tuple val("5N"),  path("*_5N_*"),  emit: five
+        tuple val("6N"),  path("*_6N_*"),  emit: six
+        tuple val("7N"),  path("*_7N_*"),  emit: seven
+        tuple val("8N"),  path("*_8N_*"),  emit: eight
+        tuple val("9N"),  path("*_9N_*"),  emit: nine
+        tuple val("10N"), path("*_10N_*"), emit: ten
+        tuple val("11N"), path("*_11N_*"), emit: eleven
+        tuple val("12N"), path("*_12N_*"), emit: twelve
+        tuple val("13N"), path("*_13N_*"), emit: thirteen
+        tuple val("14N"), path("*_14N_*"), emit: fourteen
+        tuple val("15N"), path("*_15N_*"), emit: fifteen
 
 
     script:
 
         """
-        Amotif="AATAAA"
-        Amask="AAAAAA"
-        Umotif="TTGTTT"
-        Umask="TTTTTT"
+    
         stretch=""
 
-
-        for ((i=1; i<=15;i++));do
+        for ((i=0; i<=15;i++));do
 
             stretch+="N"
-            seq2profile.pl \$Amotif\${stretch}\${Umotif} 2 > coMotif_\${i}N.motif
-            seq2profile.pl \$Amask\${stretch}\${Umotif} 0 > coMotif_\${i}N_mask_A.motif
-            seq2profile.pl \$Amotif\${stretch}\${Umask} 0 > coMotif_\${i}N_mask_T.motif
-            seq2profile.pl \$Amask\${stretch}\${Umask} 0 > coMotif_\${i}N_mask_AT.motif
-
+            seq2profile.pl ${a_rich_motif}\${stretch}${u_rich_motif} 0 > coMotif_${a_rich_motif}_\${i}N_${u_rich_motif}.motif
+        
         done
         """
 }
-
