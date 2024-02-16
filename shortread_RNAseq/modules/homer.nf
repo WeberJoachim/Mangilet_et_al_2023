@@ -197,7 +197,7 @@ process homer_count_coMotifs {
 
 
     output:
-        path("co_occurence_*"), emit: outputfolder
+        path("*countRegions_with_Motif.txt")
 	
 
     script:
