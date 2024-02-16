@@ -182,3 +182,33 @@ process homer_buildMotif_cooccurence{
         done
         """
 }
+
+
+
+process homer_count_coMotifs {
+
+    publishDir 'results/count_coMotifs/'
+    label "homer_countMotifs"
+
+    input:
+        tuple val(name_regions), path(regions), val(name_background), path(background)
+	    path '*.motif'
+        path(genome)
+
+
+    output:
+        path("co_occurence_*"), emit: outputfolder
+	
+
+    script:
+        """
+	
+	    cat *.motif >> co_motif_Urich_Arich.motif
+
+        annotatePeaks.pl ${regions} ${genome} -m co_motif_Urich_Arich.motif > ${name_regions}_countRegions_with_Motif.txt
+        annotatePeaks.pl ${background} ${genome} -m co_motif_Urich_Arich.motif > ${name_background}_countRegions_with_Motif.txt
+
+        """
+
+}
+
