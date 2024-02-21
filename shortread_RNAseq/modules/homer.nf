@@ -220,14 +220,14 @@ process homer_count_coMotifs {
 
 
     output:
-        path("*countRegions_with_Motif_*.txt")
+        path("*countRegions_with_Motif.txt")
 	
 
     script:
         """
 		    
-        annotatePeaks.pl ${regions} ${genome} -norevopp -m ${arich_motif} ${urich_motif} ${use_motif} -mask > ${name_regions}_countRegions_with_Motif.txt
-        annotatePeaks.pl ${background} ${genome} -norevopp -m ${arich_motif} ${urich_motif} ${use_motif} -mask > ${name_background}_countRegions_with_Motif.txt
+        annotatePeaks.pl ${regions} ${genome} -m ${arich_motif} ${urich_motif} ${use_motif} -mask > ${name_regions}_countRegions_with_Motif.txt
+        annotatePeaks.pl ${background} ${genome} -m ${arich_motif} ${urich_motif} ${use_motif} -mask > ${name_background}_countRegions_with_Motif.txt
 
         """
 
