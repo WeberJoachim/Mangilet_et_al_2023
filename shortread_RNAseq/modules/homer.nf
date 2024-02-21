@@ -197,16 +197,17 @@ process homer_count_coMotifs {
 
 
     output:
-        path("*countRegions_with_Motif.txt")
+        path("*countRegions_with_Motif_*.txt")
 	
 
     script:
         """
 	
 	    cat *.motif >> co_motif_Urich_Arich.motif
+	spacer=\$(head co_motif_Urich_Arich.motif -n 1 | awk '{ print \$2 }' | cut -c 7- | rev | cut -c 7- | rev | tr -d "\n"  | wc -c)
 
-        annotatePeaks.pl ${regions} ${genome} -m co_motif_Urich_Arich.motif > ${name_regions}_countRegions_with_Motif.txt
-        annotatePeaks.pl ${background} ${genome} -m co_motif_Urich_Arich.motif > ${name_background}_countRegions_with_Motif.txt
+        annotatePeaks.pl ${regions} ${genome} -norevopp  -m co_motif_Urich_Arich.motif > ${name_regions}_countRegions_with_Motif_\${spacer}.txt
+        annotatePeaks.pl ${background} ${genome} -norevopp -m co_motif_Urich_Arich.motif > ${name_background}_countRegions_with_Motif_\${spacer}.txt
 
         """
 

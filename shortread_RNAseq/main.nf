@@ -204,7 +204,7 @@ workflow {
                 homer_co_countMotifs14(preprocess_and_extend_bed.out.combine(preprocess_and_extend_bed_custom_background.out), homer_buildMotif_cooccurence.out.fourteen.collect(), preprocess_genome.out.collect())
                 homer_co_countMotifs15(preprocess_and_extend_bed.out.combine(preprocess_and_extend_bed_custom_background.out), homer_buildMotif_cooccurence.out.fifteen.collect(),  preprocess_genome.out.collect())
 
-                homer_count_coMotifs1( preprocess_and_extend_bed.out.combine(preprocess_and_extend_bed_custom_background.out), homer_buildMotif_cooccurence.out.zero.collect(),     preprocess_genome.out.collect())
+                homer_count_coMotifs0( preprocess_and_extend_bed.out.combine(preprocess_and_extend_bed_custom_background.out), homer_buildMotif_cooccurence.out.zero.collect(),     preprocess_genome.out.collect())
                 homer_count_coMotifs1( preprocess_and_extend_bed.out.combine(preprocess_and_extend_bed_custom_background.out), homer_buildMotif_cooccurence.out.one.collect(),      preprocess_genome.out.collect())
                 homer_count_coMotifs2( preprocess_and_extend_bed.out.combine(preprocess_and_extend_bed_custom_background.out), homer_buildMotif_cooccurence.out.two.collect(),      preprocess_genome.out.collect())
                 homer_count_coMotifs3( preprocess_and_extend_bed.out.combine(preprocess_and_extend_bed_custom_background.out), homer_buildMotif_cooccurence.out.three.collect(),    preprocess_genome.out.collect())
