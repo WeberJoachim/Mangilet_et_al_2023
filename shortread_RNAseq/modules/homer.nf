@@ -118,18 +118,21 @@ process homer_co_countMotifs {
 
     input:
         tuple val(name_regions), path(regions), val(name_background), path(background)
+	path '*.motif'
         path(genome)
-        tuple val(name), path(motif), path(maskA), path(maskAT), path(maskT)
 
 
     output:
         path("co_occurence_*"), emit: outputfolder
+	
 
     script:
         """
+	
+	cat *.motif >> co_motif_Urich_Arich.motif
+	spacer=\$(head co_motif_Urich_Arich.motif -n 1 | awk '{ print \$2 }' | cut -c 7- | rev | cut -c 7- | rev | tr -d "\n"  | wc -c) 
 
-        findMotifsGenome.pl ${regions} ${genome} ./co_occurence_${name}_${name_regions}_${name_background} -norevopp -size given -mknown ${motif} -maskMotif ${maskA} ${maskT} ${maskAT} -bg ${background}
-
+        findMotifsGenome.pl ${regions} ${genome} ./co_occurence_\${spacer}_${name_regions}_${name_background} -norevopp -mknown co_motif_Urich_Arich.motif -bg ${background} -nomotif
         """
 
 }
@@ -140,43 +143,73 @@ process homer_buildMotif_cooccurence{
 
     label "homer_buildMotif"
 
+
+    input:
+        tuple val(a_rich_motif), val(u_rich_motif)
+
+
     output:
-        tuple val("1N"),  path("*_1N.motif"),  path("*_1N_mask_A.motif"),  path("*_1N_mask_AT.motif"),  path("*_1N_mask_T.motif"),  emit: one
-        tuple val("2N"),  path("*_2N.motif"),  path("*_2N_mask_A.motif"),  path("*_2N_mask_AT.motif"),  path("*_2N_mask_T.motif"),  emit: two
-        tuple val("3N"),  path("*_3N.motif"),  path("*_3N_mask_A.motif"),  path("*_3N_mask_AT.motif"),  path("*_3N_mask_T.motif"),  emit: three
-        tuple val("4N"),  path("*_4N.motif"),  path("*_4N_mask_A.motif"),  path("*_4N_mask_AT.motif"),  path("*_4N_mask_T.motif"),  emit: four
-        tuple val("5N"),  path("*_5N.motif"),  path("*_5N_mask_A.motif"),  path("*_5N_mask_AT.motif"),  path("*_5N_mask_T.motif"),  emit: five
-        tuple val("6N"),  path("*_6N.motif"),  path("*_6N_mask_A.motif"),  path("*_6N_mask_AT.motif"),  path("*_6N_mask_T.motif"),  emit: six
-        tuple val("7N"),  path("*_7N.motif"),  path("*_7N_mask_A.motif"),  path("*_7N_mask_AT.motif"),  path("*_7N_mask_T.motif"),  emit: seven
-        tuple val("8N"),  path("*_8N.motif"),  path("*_8N_mask_A.motif"),  path("*_8N_mask_AT.motif"),  path("*_8N_mask_T.motif"),  emit: eight
-        tuple val("9N"),  path("*_9N.motif"),  path("*_9N_mask_A.motif"),  path("*_9N_mask_AT.motif"),  path("*_9N_mask_T.motif"),  emit: nine
-        tuple val("10N"), path("*_10N.motif"), path("*_10N_mask_A.motif"), path("*_10N_mask_AT.motif"), path("*_10N_mask_T.motif"), emit: ten
-        tuple val("11N"), path("*_11N.motif"), path("*_11N_mask_A.motif"), path("*_11N_mask_AT.motif"), path("*_11N_mask_T.motif"), emit: eleven
-        tuple val("12N"), path("*_12N.motif"), path("*_12N_mask_A.motif"), path("*_12N_mask_AT.motif"), path("*_12N_mask_T.motif"), emit: twelve
-        tuple val("13N"), path("*_13N.motif"), path("*_13N_mask_A.motif"), path("*_13N_mask_AT.motif"), path("*_13N_mask_T.motif"), emit: thirteen
-        tuple val("14N"), path("*_14N.motif"), path("*_14N_mask_A.motif"), path("*_14N_mask_AT.motif"), path("*_14N_mask_T.motif"), emit: fourteen
-        tuple val("15N"), path("*_15N.motif"), path("*_15N_mask_A.motif"), path("*_15N_mask_AT.motif"), path("*_15N_mask_T.motif"), emit: fifteen
+
+	path("*_0N_*"),  emit: zero
+        path("*_1N_*"),  emit: one
+        path("*_2N_*"),  emit: two
+        path("*_3N_*"),  emit: three
+        path("*_4N_*"),  emit: four
+        path("*_5N_*"),  emit: five
+        path("*_6N_*"),  emit: six
+        path("*_7N_*"),  emit: seven
+        path("*_8N_*"),  emit: eight
+        path("*_9N_*"),  emit: nine
+        path("*_10N_*"), emit: ten
+        path("*_11N_*"), emit: eleven
+        path("*_12N_*"), emit: twelve
+        path("*_13N_*"), emit: thirteen
+        path("*_14N_*"), emit: fourteen
+        path("*_15N_*"), emit: fifteen
 
 
     script:
 
         """
-        Amotif="AATAAA"
-        Amask="AAAAAA"
-        Umotif="TTGTTT"
-        Umask="TTTTTT"
+    
         stretch=""
 
+        for ((i=0; i<=15;i++));do
 
-        for ((i=1; i<=15;i++));do
-
+            seq2profile.pl ${a_rich_motif}\${stretch}${u_rich_motif} 0 > coMotif_${a_rich_motif}_\${i}N_${u_rich_motif}.motif
             stretch+="N"
-            seq2profile.pl \$Amotif\${stretch}\${Umotif} 2 > coMotif_\${i}N.motif
-            seq2profile.pl \$Amask\${stretch}\${Umotif} 0 > coMotif_\${i}N_mask_A.motif
-            seq2profile.pl \$Amotif\${stretch}\${Umask} 0 > coMotif_\${i}N_mask_T.motif
-            seq2profile.pl \$Amask\${stretch}\${Umask} 0 > coMotif_\${i}N_mask_AT.motif
 
         done
         """
+}
+
+
+
+process homer_count_coMotifs {
+
+    publishDir 'results/count_coMotifs/'
+    label "homer_countMotifs"
+
+    input:
+        tuple val(name_regions), path(regions), val(name_background), path(background)
+	    path '*.motif'
+        path(genome)
+
+
+    output:
+        path("*countRegions_with_Motif_*.txt")
+	
+
+    script:
+        """
+	
+	    cat *.motif >> co_motif_Urich_Arich.motif
+	spacer=\$(head co_motif_Urich_Arich.motif -n 1 | awk '{ print \$2 }' | cut -c 7- | rev | cut -c 7- | rev | tr -d "\n"  | wc -c)
+
+        annotatePeaks.pl ${regions} ${genome} -norevopp  -m co_motif_Urich_Arich.motif > ${name_regions}_countRegions_with_Motif_\${spacer}.txt
+        annotatePeaks.pl ${background} ${genome} -norevopp -m co_motif_Urich_Arich.motif > ${name_background}_countRegions_with_Motif_\${spacer}.txt
+
+        """
+
 }
 
