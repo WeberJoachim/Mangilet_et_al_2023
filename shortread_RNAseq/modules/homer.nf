@@ -87,6 +87,25 @@ process homer_buildMotif_UUGUUU {
 }
 
 
+process homer_buildMotif_UGUA {
+
+    label "homer_buildMotif"
+
+    output:
+        path("*UGUA.motif"), emit: motif
+
+
+    script:
+        """
+
+        seq2profile.pl TGTA 0 TGTA > polyA_motif_UGUA.motif
+        
+        """
+
+}
+
+
+
 process homer_countMotifs {
 
 
@@ -192,7 +211,11 @@ process homer_count_coMotifs {
 
     input:
         tuple val(name_regions), path(regions), val(name_background), path(background)
-	    path '*.motif'
+	    path(arich_motif)
+        path(arich_mask)
+        path(urich_motif)
+        path(urich_mask)
+        path(use_motif)
         path(genome)
 
 
@@ -202,12 +225,9 @@ process homer_count_coMotifs {
 
     script:
         """
-	
-	    cat *.motif >> co_motif_Urich_Arich.motif
-	spacer=\$(head co_motif_Urich_Arich.motif -n 1 | awk '{ print \$2 }' | cut -c 7- | rev | cut -c 7- | rev | tr -d "\n"  | wc -c)
-
-        annotatePeaks.pl ${regions} ${genome} -norevopp  -m co_motif_Urich_Arich.motif > ${name_regions}_countRegions_with_Motif_\${spacer}.txt
-        annotatePeaks.pl ${background} ${genome} -norevopp -m co_motif_Urich_Arich.motif > ${name_background}_countRegions_with_Motif_\${spacer}.txt
+		    
+        annotatePeaks.pl ${regions} ${genome} -norevopp -m ${arich_motif} ${urich_motif} ${use_motif} -mask > ${name_regions}_countRegions_with_Motif.txt
+        annotatePeaks.pl ${background} ${genome} -norevopp -m ${arich_motif} ${urich_motif} ${use_motif} -mask > ${name_background}_countRegions_with_Motif.txt
 
         """
 
