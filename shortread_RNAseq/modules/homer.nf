@@ -106,6 +106,27 @@ process homer_buildMotif_UGUA {
 
 
 
+process homer_buildMotif_YA {
+
+    label "homer_buildMotif"
+
+    output:
+        path("*YA.motif"), emit: motif
+
+
+    script:
+        """
+
+        seq2profile.pl YA 0 YA > polyA_motif_YA.motif
+        
+        """
+
+}
+
+
+
+
+
 process homer_countMotifs {
 
 

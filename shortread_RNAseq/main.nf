@@ -26,21 +26,18 @@ include {rmats_U1_C}                                        from "./modules/rmat
 include {rmats_U1_70K}                                      from "./modules/rmats"
 
 
-include {homer_findMotifsGenome_custom_background}          from "./modules/homer"
-include {homer_findMotifsGenome_no_background}              from "./modules/homer"
 
 include {preprocess_and_extend_bed}                         from "./modules/quality_control_and_preprocessing"
-include {preprocess_and_extend_bed_custom_background}       from "./modules/quality_control_and_preprocessing"
+include {preprocess_bed}                                    from "./modules/quality_control_and_preprocessing"
 
 include {bedtools_getfasta}                                 from "./modules/bedtools"
-include {bedtools_getfasta as bedtools_getfasta2}           from "./modules/bedtools"
 
 include {bioconvert_fastq}                                  from "./modules/bioconvert"
-include {bioconvert_fastq as bioconvert_fastq2}             from "./modules/bioconvert"
 
 include {homer_buildMotif_AAUAAA}                           from "./modules/homer"
 include {homer_buildMotif_UUGUUU}                           from "./modules/homer"
 include {homer_buildMotif_UGUA}                             from "./modules/homer"
+include {homer_buildMotif_YA}                               from "./modules/homer"
 
 include {homer_count_coMotifs}                              from "./modules/homer"
 
@@ -69,6 +66,9 @@ workflow {
             motifsize                           = Channel.of(params.motifsize)
             a_rich_motifs                       = Channel.of(params.A_rich_motifs)
             u_rich_motifs                       = Channel.of(params.U_rich_motifs)
+            
+
+            denovo                              = Channel.of(params.denovo)
 
 
             /// Workflow
@@ -108,44 +108,27 @@ workflow {
             rmats_U1_70K(process_transcriptome_gtf.out.collect(), sam_to_bam.out.filter(~/^\[WT_.*/ ).toSortedList({a,b -> a[0] <=> b[0] }).flatten().collect(), sam_to_bam.out.filter(~/^\[U1_70K.*/ ).toSortedList({a,b -> a[0] <=> b[0] }).flatten().collect())
 
             
-            //motifanalysis - You can only run this, if you ran the Deseq2 analysis in the .pynb file. You also need to create the BED-files and Fastafiles as described in the .pynb file to be able to run this
+            //motifanalysis - You can only run this, if you ran the Deseq2 analysis in the .pynb file. You also need to create the BED-files and Fastafiles as described in the .pynb file from the 3' end seq part of this study to be able to run this
             
-            background = bed_background_rnd_intron.concat(bed_background_distal_pAs, bed_all_introns, bed_distal_pA_where_comp_rep_u1c, bed_distal_pA_where_comp_rep_u170k).ifEmpty(false)
-            regions = bed_prox_rep_pA_composite_u170k.concat(bed_prox_rep_pA_composite_u1c).ifEmpty(false)
+            
 
             if(regions != false){
                 
+                beds = bed_prox_rep_pA_composite_u170k.concat(bed_prox_rep_pA_composite_u1c, bed_background_rnd_intron, bed_background_distal_pAs,  bed_distal_pA_where_comp_rep_u1c, bed_distal_pA_where_comp_rep_u170k).ifEmpty(false)
+
+                preprocess_and_extend_bed(beds)
+                bedtools_getfasta(preprocess_and_extend_bed.out, preprocess_genome.out.collect())
+                bioconvert_fastq(bedtools_getfasta.out)
+               
+
+                preprocess_bed(beds)
 
                 homer_buildMotif_AAUAAA()
                 homer_buildMotif_UUGUUU()
                 homer_buildMotif_UGUA()
+                homer_buildMotif_YA()
 
-
-                if (background == false){
-
-                    preprocess_and_extend_bed(regions)
-                    homer_findMotifsGenome_no_background(preprocess_and_extend_bed.out, preprocess_genome.out.collect(), motifsize)
-                    bedtools_getfasta(preprocess_and_extend_bed.out, preprocess_genome.out)
-                    bioconvert_fastq(bedtools_getfasta.out)
-
-                }else{
-
-                    preprocess_and_extend_bed(regions)
-                    preprocess_and_extend_bed_custom_background(background)
-
-                    //cartesian product
-                    homer_findMotifsGenome_custom_background(preprocess_and_extend_bed.out.combine(preprocess_and_extend_bed_custom_background.out), preprocess_genome.out.collect(), motifsize.collect())
-                    bedtools_getfasta(preprocess_and_extend_bed.out, preprocess_genome.out.collect())
-                    bedtools_getfasta2(preprocess_and_extend_bed_custom_background.out, preprocess_genome.out.collect())
-                    bioconvert_fastq(bedtools_getfasta.out)
-                    bioconvert_fastq2(bedtools_getfasta2.out)
-
-                }
-
-                
-                
-
-                homer_count_coMotifs(preprocess_and_extend_bed.out.combine(preprocess_and_extend_bed_custom_background.out), homer_buildMotif_AAUAAA.out.motif,homer_buildMotif_AAUAAA.out.mask, homer_buildMotif_UUGUUU.out.motif,homer_buildMotif_UUGUUU.out.mask  , homer_buildMotif_UGUA.out, preprocess_genome.out.collect())
+                homer_count_coMotifs(preprocess_bed.out, homer_buildMotif_AAUAAA.out.motif, homer_buildMotif_UUGUUU.out.motif, homer_buildMotif_UGUA.out, homer_buildMotif_YA.out, preprocess_genome.out.collect())
                 
             } 
 }          

@@ -150,39 +150,28 @@ process hisat2_align {
 
 
 
-process preprocess_and_extend_bed_custom_background {
+process preprocess_and_find_intersecting_feature_bed {
 
     label "preprocess_bed"
 
     input:
-        tuple val(name), path(background)
+        tuple val(name), path(regions)
+        path(intron_gtf)
 
     output:
-        tuple val(name), path("*chr_ext_bg.bed"), emit: background_extended
+        tuple val(name), path("*_new.bed"), emit: new_bed
 
     script:
         """
+        bedtools intersect -s -wa -a ${intron_gtf} -b ${background} > ${name}_new.bed
 
-        awk -v OFS='\\t' '
-        {
-            if (\$6 == "-") {
-                \$2 = \$2 - 49
-                \$3 = \$3 + 50
-            } else {
-                \$2 = \$2 - 50
-                \$3 = \$3 + 49
-            }
-            print \$0
-
-        }' "${background}" > "${name}_chr_ext_bg.bed"
-
-        sed -i s/Chr1/1/g ${name}_chr_ext_bg.bed
-        sed -i s/Chr2/2/g ${name}_chr_ext_bg.bed
-        sed -i s/Chr3/3/g ${name}_chr_ext_bg.bed
-        sed -i s/Chr4/4/g ${name}_chr_ext_bg.bed
-        sed -i s/Chr5/5/g ${name}_chr_ext_bg.bed
-        sed -i s/ChrC/chloroplast/g ${name}_chr_ext_bg.bed
-        sed -i s/ChrM/mitochondria/g ${name}_chr_ext_bg.bed
+        sed -i s/Chr1/1/g ${name}_new.bed
+        sed -i s/Chr2/2/g ${name}_new.bed
+        sed -i s/Chr3/3/g ${name}_new.bed
+        sed -i s/Chr4/4/g ${name}_new.bed
+        sed -i s/Chr5/5/g ${name}_new.bed
+        sed -i s/ChrC/chloroplast/g ${name}_new.bed
+        sed -i s/ChrM/mitochondria/g ${name}_new.bed
 
         """
 }
@@ -193,11 +182,10 @@ process preprocess_and_extend_bed {
     label "preprocess_bed"
 
     input:
-        tuple val(name), path(regions)
+        tuple val(name), path(positions)
 
     output:
-
-        tuple val(name), path("*_chrext.bed"), emit: extended_bed
+        tuple val(name), path("*_ext.bed"), emit: extended_bed
 
     script:
         """
@@ -213,15 +201,15 @@ process preprocess_and_extend_bed {
             }
             print \$0
 
-        }' ${regions} > ${name}_chrext.bed
+        }' "${positions}" > "${name}_ext.bed"
 
-        sed -i s/Chr1/1/g ${name}_chrext.bed
-        sed -i s/Chr2/2/g ${name}_chrext.bed
-        sed -i s/Chr3/3/g ${name}_chrext.bed
-        sed -i s/Chr4/4/g ${name}_chrext.bed
-        sed -i s/Chr5/5/g ${name}_chrext.bed
-        sed -i s/ChrC/chloroplast/g ${name}_chrext.bed
-        sed -i s/ChrM/mitochondria/g ${name}_chrext.bed
+        sed -i s/Chr1/1/g ${name}_ext.bed
+        sed -i s/Chr2/2/g ${name}_ext.bed
+        sed -i s/Chr3/3/g ${name}_ext.bed
+        sed -i s/Chr4/4/g ${name}_ext.bed
+        sed -i s/Chr5/5/g ${name}_ext.bed
+        sed -i s/ChrC/chloroplast/g ${name}_ext.bed
+        sed -i s/ChrM/mitochondria/g ${name}_ext.bed
 
         """
 }
