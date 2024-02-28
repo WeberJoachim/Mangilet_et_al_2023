@@ -44,8 +44,8 @@ process_motif_data <- function(data, motif_column, filter_motifs) {
 
 	print("4")
 
-        positive = data %>% filter(Strand == "+" & 131 > (AAUAAA_Distance - TGTA_Distance) & (AAUAAA_Distance - TGTA_Distance) > 59 & 28 > (UUGUUU_Distance - AAUAAA_Distance) & (UUGUUU_Distance - AAUAAA_Distance) > 5 & YA_Distance - AAUAAA_Distance > 0 )
-        negative = data %>% filter(Strand == "-" & 131 > (TGTA_Distance - AAUAAA_Distance) & (TGTA_Distance - AAUAAA_Distance) > 59 & 20 > (UUGUUU_Distance - AAUAAA_Distance) & (UUGUUU_Distance - AAUAAA_Distance) > 5 & AAUAAA_Distance - YA_Distance > 0 )
+        positive = data %>% filter(Strand == "+" & 131 > (Distance_AAUAAA - Distance_TGTA) & (Distance_AAUAAA - Distance_TGTA) > 59 & 28 > (Distance_UUGUUU - Distance_AAUAAA) & (Distance_UUGUUU - Distance_AAUAAA) > 5 & Distance_YA - Distance_AAUAAA > 0 )
+        negative = data %>% filter(Strand == "-" & 131 > (Distance_TGTA - Distance_AAUAAA) & (Distance_TGTA - Distance_AAUAAA) > 59 & 20 > (Distance_UUGUUU - Distance_AAUAAA) & (Distance_UUGUUU - Distance_AAUAAA) > 5 & Distance_AAUAAA - Distance_YA > 0 )
 
 
         perfekte = rbind(positive, negative)
