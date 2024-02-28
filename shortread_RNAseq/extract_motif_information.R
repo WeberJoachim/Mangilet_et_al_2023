@@ -33,11 +33,14 @@ process_motif_data <- function(data, motif_column, filter_motifs) {
         data = process_motif_data(data, "UUGUUU.Distance.From.Peak.sequence.strand.conservation.", c("TTTTTT", "AAAAAA") )
         data = process_motif_data(data, "TGTA.Distance.From.Peak.sequence.strand.conservation.", c(""))
         data = process_motif_data(data, "YA.Distance.From.Peak.sequence.strand.conservation.", c(""))
+	
+	
+	colnames(data)
 
-        data$AAUAAA_Distance = as.numeric(data$AAUAAA_Distance)
-        data$UUGUUU_Distance = as.numeric(data$UUGUUU_Distance)
-        data$TGTA_Distance = as.numeric(data$TGTA_Distance)
-        data$YA_Distance = as.numeric(data$YA_Distance)
+        data$Distance_AAUAAA 	= as.numeric(data$Distance_AAUAAA)
+        data$Distance_UUGUUU 	= as.numeric(data$Distance_UUGUUU)
+        data$Distance_TGTA 	= as.numeric(data$Distance_TGTA)
+        data$Distance_YA 	= as.numeric(data$Distance_YA)
 
 	print("4")
 
