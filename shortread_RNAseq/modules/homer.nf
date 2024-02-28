@@ -231,26 +231,45 @@ process homer_count_coMotifs {
     label "homer_countMotifs"
 
     input:
-        tuple val(name_regions), path(regions), val(name_background), path(background)
-	    path(arich_motif)
-        path(arich_mask)
+        tuple val(name_regions), path(regions)
+        path(arich_motif)
         path(urich_motif)
-        path(urich_mask)
         path(use_motif)
+	path(cleavage_motif)
         path(genome)
 
 
     output:
-        path("*countRegions_with_Motif.txt")
+	tuple val(name_regions), path("*countRegions_with_Motif.txt")
 	
 
     script:
         """
 		    
-        annotatePeaks.pl ${regions} ${genome} -m ${arich_motif} ${urich_motif} ${use_motif} -mask > ${name_regions}_countRegions_with_Motif.txt
-        annotatePeaks.pl ${background} ${genome} -m ${arich_motif} ${urich_motif} ${use_motif} -mask > ${name_background}_countRegions_with_Motif.txt
+        annotatePeaks.pl ${regions} ${genome} -m ${arich_motif} ${urich_motif} ${use_motif} ${cleavage_motif} -mask > ${name_regions}_countRegions_with_Motif.txt
 
         """
 
 }
 
+
+process R_extract_infos_motif {
+
+
+    publishDir 'results/extracted_motif_info'
+    
+    input: 
+	tuple val(name), path(info_table)
+	path(rscript)
+
+    output:
+	path("*.bed")
+
+
+    script:
+	"""
+	
+	Rscript ${rscript} ${info_table}
+	"""
+
+}

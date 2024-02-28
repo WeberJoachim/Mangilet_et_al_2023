@@ -163,8 +163,12 @@ process preprocess_and_find_intersecting_feature_bed {
 
     script:
         """
-        bedtools intersect -s -wa -a ${intron_gtf} -b ${background} > ${name}_new.bed
+	awk -v OFS='\\t' '{print \$1, \$4, \$5, \$3, \$6, \$7}' ${intron_gtf} > ${intron_gtf.getSimpleName()}.bed
 
+        bedtools intersect -s -wa -a ${intron_gtf.getSimpleName()}.bed -b ${regions} > intersect.bed
+ 	sort -k1,1 -k2,2n intersect.bed > new_sorted.bed
+	bedtools merge -s -i new_sorted.bed -c 4,5,6 -o distinct,distinct,distinct  > ${name}_new.bed
+	
         sed -i s/Chr1/1/g ${name}_new.bed
         sed -i s/Chr2/2/g ${name}_new.bed
         sed -i s/Chr3/3/g ${name}_new.bed
@@ -172,7 +176,7 @@ process preprocess_and_find_intersecting_feature_bed {
         sed -i s/Chr5/5/g ${name}_new.bed
         sed -i s/ChrC/chloroplast/g ${name}_new.bed
         sed -i s/ChrM/mitochondria/g ${name}_new.bed
-
+	
         """
 }
 
@@ -212,4 +216,41 @@ process preprocess_and_extend_bed {
         sed -i s/ChrM/mitochondria/g ${name}_ext.bed
 
         """
+}
+
+
+
+process getnonpolyAintrons {
+
+
+    label "bedtools"
+
+    input:
+	path(intron_gtf)
+	path(all_pAs)
+	tuple val(name_u170k1), path(regions_u170k1), val(name_u170k2), path(regions_u170k2)
+        tuple val(name_u1c1), path(regions_u1c1), val(name_u1c2), path(regions_u1c2)
+	tuple val(name_WT_pAs), path(regions_WT_pAs)
+
+
+
+    output:
+	
+	tuple val("nonPA_introns"), path("collapsed_introns_without_pA.bed")
+
+    script:
+	
+	"""
+
+	grep intron ${intron_gtf} > only_introns.gtf
+	awk -v OFS='\\t' '{print \$1, \$4, \$5, \$3, \$6, \$7}' only_introns.gtf > ${intron_gtf.getSimpleName()}_only_introns.bed
+
+	bedtools intersect -v -s -a ${intron_gtf.getSimpleName()}_only_introns.bed -b ${all_pAs} ${regions_WT_pAs} ${regions_u1c1} ${regions_u1c2} ${regions_u170k1} ${regions_u170k2} > introns_without_pA.bed
+
+	sort -k1,1 -k2,2n introns_without_pA.bed > new_sorted.bed
+        bedtools merge -s -i new_sorted.bed -c 4,5,6 -o distinct,distinct,distinct  > collapsed_introns_without_pA.bed
+
+
+	"""
+
 }

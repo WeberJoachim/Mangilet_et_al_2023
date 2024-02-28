@@ -28,7 +28,11 @@ include {rmats_U1_70K}                                      from "./modules/rmat
 
 
 include {preprocess_and_extend_bed}                         from "./modules/quality_control_and_preprocessing"
-include {preprocess_bed}                                    from "./modules/quality_control_and_preprocessing"
+include {preprocess_and_find_intersecting_feature_bed}      from "./modules/quality_control_and_preprocessing"
+
+include {getnonpolyAintrons}				    from "./modules/quality_control_and_preprocessing"
+
+
 
 include {bedtools_getfasta}                                 from "./modules/bedtools"
 
@@ -40,6 +44,7 @@ include {homer_buildMotif_UGUA}                             from "./modules/home
 include {homer_buildMotif_YA}                               from "./modules/homer"
 
 include {homer_count_coMotifs}                              from "./modules/homer"
+include {R_extract_infos_motif}				    from "./modules/homer"
 
 
 
@@ -66,10 +71,10 @@ workflow {
             motifsize                           = Channel.of(params.motifsize)
             a_rich_motifs                       = Channel.of(params.A_rich_motifs)
             u_rich_motifs                       = Channel.of(params.U_rich_motifs)
-            
-
+            intron_gtf				= Channel.fromPath(params.intron_gtf)
+	    bed_all_pA_plantapadb		= Channel.fromPath(params.pAs_plantapadb)
             denovo                              = Channel.of(params.denovo)
-
+	    rscript				= Channel.fromPath(params.rscript)
 
             /// Workflow
             // Initial Qualitycontrol
@@ -110,25 +115,29 @@ workflow {
             
             //motifanalysis - You can only run this, if you ran the Deseq2 analysis in the .pynb file. You also need to create the BED-files and Fastafiles as described in the .pynb file from the 3' end seq part of this study to be able to run this
             
-            
+            regions = bed_prox_rep_pA_composite_u170k.concat(bed_prox_rep_pA_composite_u1c, bed_background_distal_pAs,  bed_distal_pA_where_comp_rep_u1c, bed_distal_pA_where_comp_rep_u170k).ifEmpty(false)
+ 
 
             if(regions != false){
                 
-                beds = bed_prox_rep_pA_composite_u170k.concat(bed_prox_rep_pA_composite_u1c, bed_background_rnd_intron, bed_background_distal_pAs,  bed_distal_pA_where_comp_rep_u1c, bed_distal_pA_where_comp_rep_u170k).ifEmpty(false)
 
-                preprocess_and_extend_bed(beds)
+                preprocess_and_extend_bed(regions)
                 bedtools_getfasta(preprocess_and_extend_bed.out, preprocess_genome.out.collect())
                 bioconvert_fastq(bedtools_getfasta.out)
                
 
-                preprocess_bed(beds)
+                preprocess_and_find_intersecting_feature_bed(regions, intron_gtf.collect())
+
+		getnonpolyAintrons(intron_gtf.collect(), bed_all_pA_plantapadb.collect(), preprocess_and_find_intersecting_feature_bed.out.filter(~/.*u1c.*/).toSortedList({a,b -> a[0] <=> b[0] }).flatten().collect(), preprocess_and_find_intersecting_feature_bed.out.filter(~/.*u170k.*/).toSortedList({a,b -> a[0] <=> b[0] }).flatten().collect(), preprocess_and_find_intersecting_feature_bed.out.filter(~/.*WT_consensus.*/).toSortedList({a,b -> a[0] <=> b[0] }).flatten().collect())
+		
 
                 homer_buildMotif_AAUAAA()
                 homer_buildMotif_UUGUUU()
                 homer_buildMotif_UGUA()
                 homer_buildMotif_YA()
 
-                homer_count_coMotifs(preprocess_bed.out, homer_buildMotif_AAUAAA.out.motif, homer_buildMotif_UUGUUU.out.motif, homer_buildMotif_UGUA.out, homer_buildMotif_YA.out, preprocess_genome.out.collect())
-                
+                homer_count_coMotifs(preprocess_and_find_intersecting_feature_bed.out.concat(getnonpolyAintrons.out), homer_buildMotif_AAUAAA.out.motif, homer_buildMotif_UUGUUU.out.motif, homer_buildMotif_UGUA.out, homer_buildMotif_YA.out, preprocess_genome.out.collect())
+               
+		R_extract_infos_motif(homer_count_coMotifs.out, rscript.collect())
             } 
 }          
