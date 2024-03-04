@@ -42,27 +42,37 @@ input_file = args[0]
 name = input_file[:-28]
 print(name)
 data = pd.read_csv(input_file, sep='\t')
+
 data = process_motif_data(data, 21, ["AAAAAA", "TTTTTT"])
+print("1")
+
 data = process_motif_data(data, 21, ["TTTTTT", "AAAAAA"])
+print("2")
+
 data = process_motif_data(data, 22, [])
-#data = process_motif_data(data, 23, [])
+print("3")
 
-for col in data.columns:
-    print(col)
-
-
-
-data["AAUAAA_Numeric"] = pd.to_numeric(data["AAUAAA_Numeric"])
-data["UUGUUU_Numeric"] = pd.to_numeric(data["UUGUUU_Numeric"])
-data["TGTA_Numeric"] = pd.to_numeric(data["TGTA_Numeric"])
-#data["YA_Numeric"] = pd.to_numeric(data["YA_Numeric"])
-
+data = process_motif_data(data, 23, [])
 print("4")
 
-positive = data[(data["Strand"] == "+") & (131 > (data["AAUAAA_Numeric"] - data["TGTA_Numeric"])) & ((data["AAUAAA_Numeric"] - data["TGTA_Numeric"]) > 59) & (28 > (data["UUGUUU_Numeric"] - data["AAUAAA_Numeric"])) & ((data["UUGUUU_Numeric"] - data["AAUAAA_Numeric"]) > 5) ]
-negative = data[(data["Strand"] == "-") & (131 > (data["TGTA_Numeric"] - data["AAUAAA_Numeric"])) & ((data["TGTA_Numeric"] - data["AAUAAA_Numeric"]) > 59) & (28 > (data["AAUAAA_Numeric"] - data["UUGUUU_Numeric"])) & ((data["AAUAAA_Numeric"] - data["UUGUUU_Numeric"]) > 5) ]
 
-perfekte = pd.concat([positive, negative])
+
+
+data["AAUAAA_Numeric"]  = pd.to_numeric(data["AAUAAA_Numeric"])
+data["UUGUUU_Numeric"]  = pd.to_numeric(data["UUGUUU_Numeric"])
+data["TGTA_Numeric"]    = pd.to_numeric(data["TGTA_Numeric"])
+data["YA_Numeric"]      = pd.to_numeric(data["YA_Numeric"])
+
+print("5")
+
+positive_upstream   = data[(data["Strand"] == "+") & (131 > (data["AAUAAA_Numeric"] - data["TGTA_Numeric"])) & ((data["AAUAAA_Numeric"] - data["TGTA_Numeric"]) > 59) & (11 > (data["UUGUUU_Numeric"] - data["AAUAAA_Numeric"])) & ((data["UUGUUU_Numeric"] - data["AAUAAA_Numeric"]) > 5)  & data["UUGUUU_Numeric"] < data["YA_Numeric"]]
+positive_downstream = data[(data["Strand"] == "+") & (131 > (data["AAUAAA_Numeric"] - data["TGTA_Numeric"])) & ((data["AAUAAA_Numeric"] - data["TGTA_Numeric"]) > 59) & (28 > (data["UUGUUU_Numeric"] - data["AAUAAA_Numeric"])) & ((data["UUGUUU_Numeric"] - data["AAUAAA_Numeric"]) > 16) & data["UUGUUU_Numeric"] > data["YA_Numeric"]]
+
+negative_upstream   = data[(data["Strand"] == "-") & (131 > (data["TGTA_Numeric"] - data["AAUAAA_Numeric"])) & ((data["TGTA_Numeric"] - data["AAUAAA_Numeric"]) > 59) & (28 > (data["AAUAAA_Numeric"] - data["UUGUUU_Numeric"])) & ((data["AAUAAA_Numeric"] - data["UUGUUU_Numeric"]) > 5)  & data["UUGUUU_Numeric"] > data["YA_Numeric"]]
+negative_downstream = data[(data["Strand"] == "-") & (131 > (data["TGTA_Numeric"] - data["AAUAAA_Numeric"])) & ((data["TGTA_Numeric"] - data["AAUAAA_Numeric"]) > 59) & (11 > (data["AAUAAA_Numeric"] - data["UUGUUU_Numeric"])) & ((data["AAUAAA_Numeric"] - data["UUGUUU_Numeric"]) > 16) & data["UUGUUU_Numeric"] < data["YA_Numeric"]]
+
+
+perfekte = pd.concat([positive_upstream, positive_downstream, negative_downstream, negative_upstream ])
 positionen_perfekt = perfekte[["Chr", "Start", "End", "Strand"]].drop_duplicates()
 print("5")
 positionen_perfekt.to_csv(f"{name}_perfect_motifs.bed", sep='\t', header=False, index=False)
