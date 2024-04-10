@@ -240,7 +240,8 @@ process homer_count_coMotifs {
 
 
     output:
-	tuple val(name_regions), path("*countRegions_with_Motif.txt")
+	path("*countRegions_with_Motif.txt"), emit: info
+	val(name_regions), emit: name
 	
 
     script:
@@ -256,20 +257,45 @@ process homer_count_coMotifs {
 process R_extract_infos_motif {
 
 
-    publishDir 'results/extracted_motif_info'
+    publishDir 'results/extracted_motif_info', saveAs: {filename -> "${filename.substring(0,filename.length()-4)}_${task.index}.bed"}
     
     input: 
-	tuple val(name), path(info_table)
+	file x
 	path(rscript)
 
     output:
 	path("*.bed")
+	
+
+    script:
+	"""
+	name=\$(head ${x} -n 1 | cut -d " " -f 3 | cut -d . -f 1)
+		
+	python3 ${rscript} ${x}
+	mv *.bed \${name}.bed
+	"""
+
+}
+
+
+
+process py_extract_infos_motif {
+
+
+    publishDir 'results/extracted_motif_info', saveAs: {filename -> "${task.process}_${task.index}.bed"}
+    
+    input: 
+	file x
+	path(rscript)
+
+    output:
+	path("*.bed"); 
 
 
     script:
 	"""
 	
-	Rscript ${rscript} ${info_table}
+	python3 ${rscript} ${x}
 	"""
 
 }

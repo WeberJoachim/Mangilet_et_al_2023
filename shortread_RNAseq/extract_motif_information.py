@@ -65,14 +65,14 @@ data["YA_Numeric"]      = pd.to_numeric(data["YA_Numeric"])
 
 print("5")
 
-positive_upstream   = data[(data["Strand"] == "+") & (131 > (data["AAUAAA_Numeric"] - data["TGTA_Numeric"])) & ((data["AAUAAA_Numeric"] - data["TGTA_Numeric"]) > 59) & (31 > (data["YA_Numeric"] - data["AAUAAA_Numeric"])) & ((data["YA_Numeric"] - data["AAUAAA_Numeric"]) > 9)  & ((data["UUGUUU_Numeric"] - data["YA_Numeric"]) < 0) & ((data["AAUAAA_Numeric"] - data["UUGUUU_Numeric"]) < 0)]
-positive_downstream = data[(data["Strand"] == "+") & (131 > (data["AAUAAA_Numeric"] - data["TGTA_Numeric"])) & ((data["AAUAAA_Numeric"] - data["TGTA_Numeric"]) > 59) & (31 > (data["YA_Numeric"] - data["AAUAAA_Numeric"])) & ((data["YA_Numeric"] - data["AAUAAA_Numeric"]) > 9)  & (21 > (data["UUGUUU_Numeric"] - data["YA_Numeric"])) & ((data["UUGUUU_Numeric"] - data["YA_Numeric"]) > 9)]
+positive_upstream   = data[(data["Strand"] == "+") & (16 > (data["AAUAAA_Numeric"] - data["TGTA_Numeric"])) & ((data["AAUAAA_Numeric"] - data["TGTA_Numeric"]) > 4) & (26 > (data["YA_Numeric"] - data["AAUAAA_Numeric"])) & ((data["YA_Numeric"] - data["AAUAAA_Numeric"]) > 14)  & ((data["UUGUUU_Numeric"] - data["YA_Numeric"]) < 0) & ((data["AAUAAA_Numeric"] - data["UUGUUU_Numeric"]) < 0)]
+positive_downstream = data[(data["Strand"] == "+") & (16 > (data["AAUAAA_Numeric"] - data["TGTA_Numeric"])) & ((data["AAUAAA_Numeric"] - data["TGTA_Numeric"]) > 4) & (26 > (data["YA_Numeric"] - data["AAUAAA_Numeric"])) & ((data["YA_Numeric"] - data["AAUAAA_Numeric"]) > 14)  & (21 > (data["UUGUUU_Numeric"] - data["YA_Numeric"])) & ((data["UUGUUU_Numeric"] - data["YA_Numeric"]) > 9)]
 
-negative_upstream   = data[(data["Strand"] == "-") & (131 > (data["TGTA_Numeric"] - data["AAUAAA_Numeric"])) & ((data["TGTA_Numeric"] - data["AAUAAA_Numeric"]) > 59) & (31 > (data["AAUAAA_Numeric"] - data["YA_Numeric"])) & ((data["AAUAAA_Numeric"] - data["YA_Numeric"]) > 9)  & ((data["UUGUUU_Numeric"] - data["YA_Numeric"]) > 0) & ((data["AAUAAA_Numeric"] > data["UUGUUU_Numeric"]) > 0)]
-negative_downstream = data[(data["Strand"] == "-") & (131 > (data["TGTA_Numeric"] - data["AAUAAA_Numeric"])) & ((data["TGTA_Numeric"] - data["AAUAAA_Numeric"]) > 59) & (31 > (data["AAUAAA_Numeric"] - data["YA_Numeric"])) & ((data["AAUAAA_Numeric"] - data["YA_Numeric"]) > 9)  & (21 > (data["YA_Numeric"] - data["UUGUUU_Numeric"])) & ((data["YA_Numeric"] - data["UUGUUU_Numeric"]) > 9)]
+negative_upstream   = data[(data["Strand"] == "-") & (16 > (data["TGTA_Numeric"] - data["AAUAAA_Numeric"])) & ((data["TGTA_Numeric"] - data["AAUAAA_Numeric"]) > 4) & (26 > (data["AAUAAA_Numeric"] - data["YA_Numeric"])) & ((data["AAUAAA_Numeric"] - data["YA_Numeric"]) > 14)  & ((data["UUGUUU_Numeric"] - data["YA_Numeric"]) > 0) & ((data["AAUAAA_Numeric"] > data["UUGUUU_Numeric"]) > 0)]
+negative_downstream = data[(data["Strand"] == "-") & (16 > (data["TGTA_Numeric"] - data["AAUAAA_Numeric"])) & ((data["TGTA_Numeric"] - data["AAUAAA_Numeric"]) > 4) & (26 > (data["AAUAAA_Numeric"] - data["YA_Numeric"])) & ((data["AAUAAA_Numeric"] - data["YA_Numeric"]) > 14)  & (21 > (data["YA_Numeric"] - data["UUGUUU_Numeric"])) & ((data["YA_Numeric"] - data["UUGUUU_Numeric"]) > 9)]
 
 
 perfekte = pd.concat([positive_upstream, positive_downstream, negative_downstream, negative_upstream ])
 positionen_perfekt = perfekte[["Chr", "Start", "End", "Strand"]].drop_duplicates()
-print("5")
+print("6")
 positionen_perfekt.to_csv(f"{name}_perfect_motifs.bed", sep='\t', header=False, index=False)

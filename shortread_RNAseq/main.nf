@@ -45,7 +45,7 @@ include {homer_buildMotif_YA}                               from "./modules/home
 
 include {homer_count_coMotifs}                              from "./modules/homer"
 include {R_extract_infos_motif}				    from "./modules/homer"
-
+include {py_extract_infos_motif}			    from "./modules/homer" 
 
 
 
@@ -74,8 +74,8 @@ workflow {
             intron_gtf				= Channel.fromPath(params.intron_gtf)
 	    bed_all_pA_plantapadb		= Channel.fromPath(params.pAs_plantapadb)
             denovo                              = Channel.of(params.denovo)
-	    rscript				= Channel.fromPath(params.rscript)
-
+	    pyscript				= Channel.fromPath(params.pyscript)
+	    txt_all_introns 			= Channel.fromPath(params.txt_all_introns)
             /// Workflow
             // Initial Qualitycontrol
             fastqc_before(reads)
@@ -138,6 +138,8 @@ workflow {
 
                 homer_count_coMotifs(preprocess_and_find_intersecting_feature_bed.out.concat(getnonpolyAintrons.out), homer_buildMotif_AAUAAA.out.motif, homer_buildMotif_UUGUUU.out.motif, homer_buildMotif_UGUA.out, homer_buildMotif_YA.out, preprocess_genome.out.collect())
                
-		R_extract_infos_motif(homer_count_coMotifs.out, rscript.collect())
+		R_extract_infos_motif(homer_count_coMotifs.out.info.splitText(by: 20, keepHeader: true), pyscript.collect())
+		
+		
             } 
 }          

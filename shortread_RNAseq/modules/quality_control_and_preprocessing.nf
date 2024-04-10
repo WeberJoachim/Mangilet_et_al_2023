@@ -163,7 +163,8 @@ process preprocess_and_find_intersecting_feature_bed {
 
     script:
         """
-	awk -v OFS='\\t' '{print \$1, \$4, \$5, \$3, \$6, \$7}' ${intron_gtf} > ${intron_gtf.getSimpleName()}.bed
+	grep -v .-AT ${intron_gtf} > temp.gtf
+	awk -v OFS='\\t' '{print \$1, \$4, \$5, \$3, \$6, \$7}' temp.gtf > ${intron_gtf.getSimpleName()}.bed
 
         bedtools intersect -s -wa -a ${intron_gtf.getSimpleName()}.bed -b ${regions} > intersect.bed
  	sort -k1,1 -k2,2n intersect.bed > new_sorted.bed
@@ -243,7 +244,8 @@ process getnonpolyAintrons {
 	"""
 
 	grep intron ${intron_gtf} > only_introns.gtf
-	awk -v OFS='\\t' '{print \$1, \$4, \$5, \$3, \$6, \$7}' only_introns.gtf > ${intron_gtf.getSimpleName()}_only_introns.bed
+	grep -v .-AT only_introns.gtf > only_introns2.gtf
+	awk -v OFS='\\t' '{print \$1, \$4, \$5, \$3, \$6, \$7}' only_introns2.gtf > ${intron_gtf.getSimpleName()}_only_introns.bed
 
 	bedtools intersect -v -s -a ${intron_gtf.getSimpleName()}_only_introns.bed -b ${all_pAs} ${regions_WT_pAs} ${regions_u1c1} ${regions_u1c2} ${regions_u170k1} ${regions_u170k2} > introns_without_pA.bed
 
