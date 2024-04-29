@@ -138,7 +138,7 @@ workflow {
 
                 homer_count_coMotifs(preprocess_and_find_intersecting_feature_bed.out.concat(getnonpolyAintrons.out), homer_buildMotif_AAUAAA.out.motif, homer_buildMotif_UUGUUU.out.motif, homer_buildMotif_UGUA.out, homer_buildMotif_YA.out, preprocess_genome.out.collect())
                
-		R_extract_infos_motif(homer_count_coMotifs.out.info.splitText(by: 20, keepHeader: true), pyscript.collect())
+		R_extract_infos_motif(homer_count_coMotifs.out.info.splitText(by: 5, keepHeader: true), pyscript.collect())
 		
 		
             } 
