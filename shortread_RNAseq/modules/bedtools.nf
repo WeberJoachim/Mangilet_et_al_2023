@@ -1,5 +1,4 @@
 #!/usr/bin/env nextflow
-
 nextflow.enable.dsl=2
 
 process bedtools_getfasta {
@@ -13,8 +12,6 @@ process bedtools_getfasta {
 
     script:
         """
-
         bedtools getfasta -fi ${genome} -bed ${regions} -s -fo ${name}.fa
-
         """
 }

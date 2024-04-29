@@ -1,6 +1,6 @@
 #!/usr/bin/env nextflow
-
 nextflow.enable.dsl=2
+
 
 process preprocess_genome {
 
@@ -24,6 +24,7 @@ process preprocess_genome {
         """
 }
 
+
 process hisat2_index_genome {
     
     input:     
@@ -37,6 +38,7 @@ process hisat2_index_genome {
         hisat2-build -p 16 ${ref} index_hisat_${ref.getSimpleName()}
         """
 }
+
 
 process hisat2_genome_align {
 
