@@ -15,12 +15,11 @@ singularity pull samtools-1.9-h91753b0_8.sif https://depot.galaxyproject.org/sin
 singularity pull deeptools-3.5.1--py0.sif https://depot.galaxyproject.org/singularity/deeptools%3A3.5.1--py_0
 singularity pull deeptools-3.5.2--pyhdfd78af_1.sif https://depot.galaxyproject.org/singularity/deeptools%3A3.5.2--pyhdfd78af_1
 singularity pull macs2-2.9.1--py39hf95cd2a_0.sif https://depot.galaxyproject.org/singularity/macs2%3A2.2.9.1--py39hf95cd2a_0
-singularity pull bedgraphtobigwig-377--ha8a8165_3.sif https://depot.galaxyproject.org/singularity/ucsc-bedgraphtobigwig%3A377--ha8a8165_3
-singularity pull wiggletools_1.2.8-hedeb25_0.sif https://depot.galaxyproject.org/singularity/wiggletools%3A1.2.8--hebded25_0
-singularity pull bedops-2.4.41-h9f5acd7_0.sif https://depot.galaxyproject.org/singularity/bedops%3A2.4.41--h9f5acd7_0
 singularity pull salmon-1.9.0-h7e5ed60_1.sif https://depot.galaxyproject.org/singularity/salmon%3A1.9.0--h7e5ed60_1
-
-
+singularity pull homer-4.11--pl5321h9f5acd7_7.sif https://depot.galaxyproject.org/singularity/homer%3A4.11--pl5321h9f5acd7_7
+singularity pull bedtools_2.31.1--hf5e1c6e_0.sif https://depot.galaxyproject.org/singularity/bedtools%3A2.31.1--hf5e1c6e_0
+singularity pull bioconvert-1.1.1--pyhdfd78af_0.sif https://depot.galaxyproject.org/singularity/bioconvert%3A1.1.1--pyhdfd78af_0
+singularity pull python3_3.10.4.sif https://depot.galaxyproject.org/singularity/python%3A3.10.4
 
 
 #references
